@@ -1,17 +1,12 @@
 'use client'
 
-import { Application, Entity } from '@playcanvas/react'
-import { XRScene } from './components/XRScene'
-import { Camera } from '@playcanvas/react/components'
+import XRScene from './components/XRScene'
 
 export const App = () => {
   return (
-    <Application>
+    <div className='w-full h-full'>
       <XRScene />
-      <Entity name="Camera">
-        <Camera />
-      </Entity>
-    </Application>
+    </div>
   )
 
 }
