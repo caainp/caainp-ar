@@ -5,8 +5,8 @@ import Script from "next/script";
 const ARComponent = () => {
   const [aframeLoaded, setAframeLoaded] = useState(false);
   const [arjsLoaded, setArjsLoaded] = useState(false);
-
   const [boxes, setBoxes] = useState<any[]>([]);
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
   const spawnBox = () => {
     const cameraEl = document.querySelector("[gps-camera]");
@@ -32,6 +32,26 @@ const ARComponent = () => {
 
     setBoxes((prev: any) => [...prev, newBox]);
   };
+
+  useEffect(() => {
+    const updateViewportSize = () => {
+      if (typeof window === "undefined") return;
+      setViewportSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    updateViewportSize();
+
+    if (typeof window === "undefined") return;
+
+    window.addEventListener("resize", updateViewportSize);
+
+    return () => {
+      window.removeEventListener("resize", updateViewportSize);
+    };
+  }, []);
 
   useEffect(() => {
     console.log(boxes);
@@ -92,7 +112,7 @@ const ARComponent = () => {
           <a-scene
             vr-mode-ui="enabled: false"
             embedded
-            arjs="sourceType: webcam; sourceWidth:1280; sourceHeight:960; displayWidth: auto; displayHeight: auto; debugUIEnabled: false;"
+            arjs={`sourceType: webcam; sourceWidth:${viewportSize.width}; sourceHeight:${viewportSize.height}; displayWidth: auto; displayHeight: auto; debugUIEnabled: false;`}
             renderer="logarithmicDepthBuffer: true;"
           >
             {/* @ts-ignore */}
