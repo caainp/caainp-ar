@@ -39,7 +39,7 @@ body,
 #arjs-video {
   width: 100% !important;
   height: 100% !important;
-  object-fit: contain !important;
+  object-fit: cover !important;
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
@@ -53,7 +53,6 @@ body,
 .a-canvas {
   width: 100% !important;
   height: 100% !important;
-  object-fit: contain !important;
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
