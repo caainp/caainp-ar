@@ -24,3 +24,39 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+html,
+body,
+#__next {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  background-color: black !important;
+}
+
+#arjs-video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  margin: 0 !important;
+  transform: none !important;
+  z-index: 2 !important;
+}
+
+.a-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  z-index: 1 !important;
+}

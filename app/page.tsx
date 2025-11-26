@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import XRScene from './components/XRScene'
+import dynamic from "next/dynamic";
+
+const Scene = dynamic(() => import("./components/Scene"), {
+  ssr: false,
+  loading: () => <p className="text-white">Loading...</p>,
+});
 
 export const App = () => {
-  return (
-    <div className='w-full h-full'>
-      <XRScene />
-    </div>
-  )
+  return <Scene />;
+};
 
-}
-
-export default App
+export default App;
