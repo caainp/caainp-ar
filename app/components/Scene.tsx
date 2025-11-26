@@ -97,7 +97,7 @@ const ARComponent = () => {
       )} */}
 
       {/* --- Scene --- */}
-      {arjsLoaded && (
+      {arjsLoaded && viewportSize.width > 0 && viewportSize.height > 0 && (
         <div
           style={{
             position: "fixed",
