@@ -1,27 +1,46 @@
+'use client'
+
 import { useApp } from "@playcanvas/react/hooks";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import * as pc from 'playcanvas';
 
 export const XRScene = () => {
   const app = useApp();
   const [xrStarted, setXrStarted] = useState(false);
 
+  const isAppReady = useMemo(() => !!(app && app.root), [app]);
+
   const startXR = async () => {
-    if (app.xr && app.xr.supported) {
-      const cameraEntity = app.root.findByName('Camera') as pc.Entity & { camera: pc.Camera };
+    if (!isAppReady) {
+      alert("App is not ready yet. Please wait.");
+      return;
+    }
 
-      if (!cameraEntity || !cameraEntity.camera) {
-        alert("Camera not found");
-        return;
-      }
+    if (!app.xr) {
+      alert("XR is not available");
+      return;
+    }
 
-      try {
-        await app.xr.start(cameraEntity.camera, pc.XRTYPE_AR, pc.XRSPACE_LOCAL);
-        setXrStarted(true);
-        alert("XR started");
-      } catch (error) {
-        alert('Failed to start XR:' + error);
-      }
+    if (!app.xr.supported) {
+      alert("XR not supported");
+      return;
+    }
+
+    const cameraEntity = app.root.findByName('Camera') as pc.Entity & { camera: pc.Camera };
+
+    if (!cameraEntity || !cameraEntity.camera) {
+      alert("Camera not found");
+      return;
+    }
+
+    try {
+      // Ensure XR session is properly initialized before starting
+      await app.xr.start(cameraEntity.camera, pc.XRTYPE_AR, pc.XRSPACE_LOCAL);
+      setXrStarted(true);
+      alert("XR started");
+    } catch (error) {
+      console.error('XR start error:', error);
+      alert('Failed to start XR: ' + (error as Error).message);
     }
   };
 
@@ -34,11 +53,11 @@ export const XRScene = () => {
   }
 
   return (
-    <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 999 }}>
+    <div className="absolute top-5 left-5 z-50">
       <button 
         onClick={startXR} 
         onTouchEnd={startXR}
-        style={{ padding: '10px 20px', fontSize: '16px' }}
+        className="bg-blue-500 text-white px-4 py-2 rounded-md"
       >
         Start AR
       </button>
