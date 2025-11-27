@@ -1,26 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import { animate, createScope } from "animejs";
-import {
-  ArrowUp,
-  ArrowLeft,
-  ArrowRight,
-  MapPinLarge,
-  MapPin,
-  X,
-} from "./Icons";
-import { NavData } from "./types";
+import { MapPin, X } from "./Icons";
+import { DirectionType } from "./types";
+import RouteSummary from "./RouteSummary";
+import { useOverlayContext } from "./OverlayContext";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
+import { TbStairsDown, TbStairsUp } from "react-icons/tb";
 
-interface NavigationCardProps {
-  isLoadingDestination: boolean;
-  navData: NavData;
-  onCancelDestination?: () => void;
-}
-
-export default function NavigationCard({
-  isLoadingDestination,
-  navData,
-  onCancelDestination,
-}: NavigationCardProps) {
+export default function NavigationCard() {
+  const { isLoadingDestination, navData, handleCancelDestination } =
+    useOverlayContext();
   const rootRef = useRef<HTMLDivElement>(null);
   const scopeRef = useRef<ReturnType<typeof createScope> | null>(null);
   const wasLoadingRef = useRef(isLoadingDestination);
@@ -80,63 +69,80 @@ export default function NavigationCard({
     wasLoadingRef.current = isLoadingDestination;
   }, [isLoadingDestination]);
 
-  const renderDirectionIcon = () => {
-    switch (navData.currentAction) {
-      case "front":
-        return <ArrowUp />;
-      case "left":
-        return <ArrowLeft />;
-      case "right":
-        return <ArrowRight />;
-      case "back":
-        return <MapPinLarge />;
+  const renderDirectionIcon = (directionType: DirectionType) => {
+    switch (directionType) {
+      case "STRAIGHT":
+        return <ArrowUp size={24} />;
+      case "LEFT":
+        return <ArrowLeft size={24} />;
+      case "RIGHT":
+        return <ArrowRight size={24} />;
+      case "TURN_BACK":
+        return <ArrowDown size={24} />;
+      case "STAIRS_UP":
+        return <TbStairsUp size={24} />;
+      case "STAIRS_DOWN":
+        return <TbStairsDown size={24} />;
       default:
         return null;
     }
   };
 
+  const getDirectionStyles = () => {
+    return {
+      container: "bg-zinc-800 ring-1 ring-zinc-700",
+      icon: "text-zinc-100",
+    };
+  };
+
   return (
     <div
       ref={rootRef}
-      className="w-full max-w-sm mx-auto mb-6 pointer-events-auto"
+      className="w-full max-w-sm mx-auto pointer-events-auto bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl"
     >
-      <div className="bg-black/70 backdrop-blur-xl rounded-3xl p-5 border border-white/10 shadow-2xl flex items-center gap-4">
-        <div className="shrink-0 w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-inner shadow-zinc-400/20 overflow-hidden">
+      {/* 메인 네비게이션 카드 */}
+      <div className="p-4 flex items-center gap-4">
+        <div
+          className={`shrink-0 w-14 h-14 rounded-xl flex items-center justify-center ${
+            getDirectionStyles().container
+          }`}
+        >
           {isLoadingDestination ? (
-            <div className="loading-spinner w-8 h-8 border-2 border-white/30 border-t-white/90 rounded-full" />
+            <div className="loading-spinner w-6 h-6 border-2 border-zinc-500 border-t-zinc-200 rounded-full" />
           ) : (
-            <span className="direction-icon text-zinc-200 text-4xl">
-              {renderDirectionIcon()}
+            <span className={`direction-icon ${getDirectionStyles().icon}`}>
+              {renderDirectionIcon(navData.move_instruction.direction_type)}
             </span>
           )}
         </div>
-        <div className="flex flex-col flex-1">
-          <div className="flex items-baseline gap-2">
-            <div className="flex items-center gap-2 mb-2 w-full justify-between">
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <MapPin />
-                <span>{navData.destination}</span>
-              </div>
-              {onCancelDestination && (
-                <button
-                  onClick={onCancelDestination}
-                  className="p-1.5 rounded-lg bg-white/10 hover:bg-red-500/50 transition-all text-gray-400 hover:text-white"
-                  title="목적지 취소"
-                >
-                  <X size={14} />
-                </button>
-              )}
+        <div className="flex flex-col flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <div className="flex items-center gap-1.5 text-xs text-zinc-400 truncate">
+              <MapPin size={12} />
+              <span className="truncate">{navData.destination}</span>
             </div>
+            {handleCancelDestination && (
+              <button
+                onClick={handleCancelDestination}
+                className="shrink-0 p-1.5 rounded-lg hover:bg-zinc-800 transition-colors text-zinc-500 hover:text-zinc-300"
+                title="목적지 취소"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
           {isLoadingDestination ? (
-            <div className="loading-pulse h-6 w-3/4 rounded bg-white/20" />
+            <div className="loading-pulse h-5 w-3/4 rounded bg-zinc-800" />
           ) : (
-            <p className="instruction-text text-lg font-semibold leading-tight text-white/90">
-              {navData.instruction}
+            <p className="instruction-text text-base font-medium text-zinc-100 leading-snug">
+              {navData.move_instruction.text_ko}
             </p>
           )}
         </div>
       </div>
+
+      {/* 경로 요약 */}
+      <RouteSummary />
     </div>
   );
 }

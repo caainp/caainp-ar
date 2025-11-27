@@ -11,14 +11,14 @@ export default function DestinationSelectButton({
     <button
       onClick={onClick}
       onMouseDown={(event) => event.preventDefault()}
-      className="w-full flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-blue-600/50 transition-all text-left group cursor-pointer"
+      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-800 transition-colors text-left cursor-pointer group"
     >
-      <div className="shrink-0 w-10 h-10 bg-blue-600/30 group-hover:bg-blue-600 rounded-xl flex items-center justify-center transition-all">
-        <span className="text-blue-300 group-hover:text-white">
-          <MapPin />
+      <div className="shrink-0 w-8 h-8 bg-zinc-800 group-hover:bg-zinc-700 rounded-lg flex items-center justify-center transition-colors">
+        <span className="text-zinc-400 group-hover:text-zinc-300">
+          <MapPin size={16} />
         </span>
       </div>
-      <span className="text-white/90 font-medium">{destination}</span>
+      <span className="text-zinc-200 text-sm font-medium">{destination}</span>
     </button>
   );
 }

@@ -1,32 +1,55 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useCallback, useState } from "react";
 import NavigationCard from "./NavigationCard";
 import DestinationSearch from "./DestinationSearch";
-import { CurrentAction, NavData } from "./types";
+import Debug from "./debug/Debug";
+import { NavData } from "./types";
 import { calculateDestination } from "@/app/lib/action";
+import { OverlayProvider } from "./OverlayContext";
+
+const dataUrlToFile = (dataUrl: string, filename: string) => {
+  const [header, data] = dataUrl.split(",");
+  const mimeMatch = header.match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : "image/png";
+  const binary = atob(data);
+  const len = binary.length;
+  const array = new Uint8Array(len);
+
+  for (let i = 0; i < len; i += 1) {
+    array[i] = binary.charCodeAt(i);
+  }
+
+  return new File([array], filename, { type: mime });
+};
+
+const initialNavData: NavData = {
+  schema_version: 1,
+  current_node: null,
+  next_node: null,
+  move_instruction: {
+    direction_type: "STRAIGHT",
+    angle_deg: 0,
+    text_ko: "",
+  },
+  route_summary: {
+    current_step: 0,
+    total_steps: 0,
+    remaining_steps_text: "",
+    via_nodes: [],
+  },
+  destination: null,
+};
 
 export default function Overlay() {
-  const [navData, setNavData] = useState<NavData>({
-    currentAction: "front",
-    distance: 12,
-    instruction: "복도 끝까지 직진하세요",
-    nextWaypoint: "화장실 (경유)",
-    totalSteps: 5,
-    currentStepIndex: 2,
-    destination: null, // 초기에는 목적지 없음
-    activeConstraints: ["엘리베이터 이용", "계단 제외"],
-  });
+  const [debug, setDebug] = useState(true);
+  const [navData, setNavData] = useState<NavData>(initialNavData);
 
   const [recentDestinations, setRecentDestinations] = useState<string[]>([]);
   const [isLoadingDestination, setIsLoadingDestination] = useState(false);
 
   const handleSelectDestination = async (destination: string) => {
     setIsLoadingDestination(true);
-    setNavData((prev) => ({
-      ...prev,
-      destination,
-    }));
 
     // 이미 최근 검색에 있는 목적지라면 제거 하고 최근 검색 목록의 맨 앞에 추가
     setRecentDestinations((prev) => {
@@ -37,16 +60,10 @@ export default function Overlay() {
     });
 
     try {
-      const {
-        instruction,
-        currentAction,
-      }: { instruction: string; currentAction: CurrentAction } =
-        await calculateDestination(destination);
-      setNavData((prev) => ({
-        ...prev,
-        instruction,
-        currentAction,
-      }));
+      const formData = new FormData();
+      formData.append("destination", destination);
+      const newNavData = await calculateDestination(formData);
+      setNavData(newNavData);
     } catch (error) {
       console.error(error);
     } finally {
@@ -55,10 +72,7 @@ export default function Overlay() {
   };
 
   const handleCancelDestination = () => {
-    setNavData((prev) => ({
-      ...prev,
-      destination: null,
-    }));
+    setNavData(initialNavData);
   };
 
   const handleRemoveRecentDestination = (destination: string) => {
@@ -69,26 +83,78 @@ export default function Overlay() {
     setRecentDestinations([]);
   };
 
-  return (
-    <div className="fixed inset-0 pointer-events-none z-50 flex flex-col justify-between p-4 font-sans antialiased text-white">
-      {/* AR Viewport */}
-      <div className="flex-1 flex items-center justify-center opacity-30 pointer-events-none" />
+  const handleStepChange = (newStep: number) => {
+    setNavData((prev) => ({
+      ...prev,
+      route_summary: {
+        ...prev.route_summary,
+        current_step: newStep,
+      },
+    }));
+  };
 
-      {/* 목적지가 없으면 검색 UI, 있으면 네비게이션 카드 표시 */}
-      {navData.destination ? (
-        <NavigationCard
-          isLoadingDestination={isLoadingDestination}
-          navData={navData}
-          onCancelDestination={handleCancelDestination}
-        />
-      ) : (
-        <DestinationSearch
-          onSelectDestination={handleSelectDestination}
-          recentDestinations={recentDestinations}
-          onRemoveRecentDestination={handleRemoveRecentDestination}
-          onRemoveAllRecentDestinations={handleRemoveAllRecentDestinations}
-        />
-      )}
-    </div>
+  const handleDebugCapture = useCallback(
+    async (captureImage: string) => {
+      if (!captureImage) {
+        return;
+      }
+
+      // setIsLoadingDestination(true);
+      const destinationLabel = navData.destination ?? "AR 캡처 기반 목적지";
+
+      try {
+        const formData = new FormData();
+        formData.append("destination", destinationLabel);
+        const captureFile = dataUrlToFile(
+          captureImage,
+          `ar-capture-${Date.now()}.png`
+        );
+        formData.append("captureImage", captureFile);
+
+        const newNavData = await calculateDestination(formData);
+        setNavData(newNavData);
+      } catch (error) {
+        console.error("캡처 기반 경로 계산 실패:", error);
+      } finally {
+        // setIsLoadingDestination(false);
+      }
+    },
+    [navData.destination]
+  );
+
+  return (
+    <OverlayProvider
+      value={{
+        navData,
+        setNavData,
+        isLoadingDestination,
+        setIsLoadingDestination,
+        recentDestinations,
+        setRecentDestinations,
+        handleSelectDestination,
+        handleCancelDestination,
+        handleRemoveRecentDestination,
+        handleRemoveAllRecentDestinations,
+        handleStepChange,
+        handleDebugCapture,
+      }}
+    >
+      <div className="fixed inset-0 pointer-events-none z-50 flex flex-col justify-between p-4 font-sans antialiased text-white">
+        {/* AR Viewport */}
+        <div className="flex-1 flex items-center justify-center opacity-30 pointer-events-none" />
+
+        {/* Debug */}
+        <div className="absolute top-4 left-4 justify-center">
+          {debug && <Debug />}
+        </div>
+
+        {/* 목적지가 없으면 검색 UI, 있으면 네비게이션 카드 표시 */}
+        {isLoadingDestination || navData.destination ? (
+          <NavigationCard />
+        ) : (
+          <DestinationSearch />
+        )}
+      </div>
+    </OverlayProvider>
   );
 }

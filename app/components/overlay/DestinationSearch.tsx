@@ -1,16 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, MapPin } from "./Icons";
 import DestinationSelectButton from "./DestinationSelectButton";
 import DestinationInput from "./DestinationInput";
-
-interface DestinationSearchProps {
-  onSelectDestination: (destination: string) => void;
-  recentDestinations: string[];
-  onRemoveRecentDestination: (destination: string) => void;
-  onRemoveAllRecentDestinations: () => void;
-}
+import { useOverlayContext } from "./OverlayContext";
 
 // TODO: 임시 목적지 목록
 const SAMPLE_DESTINATIONS = [
@@ -31,12 +24,12 @@ const SAMPLE_DESTINATIONS = [
   "교수연구실",
 ];
 
-export default function DestinationSearch({
-  onSelectDestination,
-  recentDestinations,
-  onRemoveRecentDestination,
-  onRemoveAllRecentDestinations,
-}: DestinationSearchProps) {
+export default function DestinationSearch() {
+  const {
+    handleSelectDestination,
+    recentDestinations,
+    handleRemoveAllRecentDestinations,
+  } = useOverlayContext();
   const [searchQuery, setSearchQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
@@ -45,7 +38,7 @@ export default function DestinationSearch({
   );
 
   const handleSelect = (destination: string) => {
-    onSelectDestination(destination);
+    handleSelectDestination(destination);
     setSearchQuery("");
     setIsFocused(false);
   };
@@ -59,12 +52,12 @@ export default function DestinationSearch({
   const hasRecentDestinations = recentDestinations.length > 0;
 
   return (
-    <div className="w-full max-w-sm mx-auto mb-4 pointer-events-auto">
-      <div className="bg-black/70 backdrop-blur-xl rounded-3xl p-3 border border-white/10 shadow-2xl">
-        {/* 입력 폼 상단 영역 */}
-        <div className="h-full">
-          {hasSearchResults ? (
-            <div className="max-h-64 overflow-y-auto space-y-2 mb-3">
+    <div className="w-full max-w-sm mx-auto pointer-events-auto bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl">
+      {/* 입력 폼 상단 영역 */}
+      <div>
+        {hasSearchResults ? (
+          <div className="max-h-72 overflow-y-auto p-2">
+            <div className="space-y-0.5">
               {filteredDestinations.map((destination) => (
                 <DestinationSelectButton
                   key={destination}
@@ -73,46 +66,54 @@ export default function DestinationSearch({
                 />
               ))}
             </div>
-          ) : hasNoSearchResults ? (
-            <div className="text-center py-8 text-gray-400">
-              <p>검색 결과가 없습니다</p>
-            </div>
-          ) : isFocused ? (
-            <div className="text-center text-gray-400">
-              {!hasRecentDestinations ? (
-                <p className="py-4">목적지를 검색하세요</p>
-              ) : (
-                <div className="py-3 px-1 flex items-center justify-between border-b border-white/5 mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-4 bg-linear-to-b from-blue-400 to-blue-600 rounded-full" />
-                    <p className="text-sm font-medium tracking-wide text-white/80 uppercase">
-                      최근 검색
-                    </p>
-                  </div>
+          </div>
+        ) : hasNoSearchResults ? (
+          <div className="py-12 px-4">
+            <p className="text-zinc-500 text-sm text-center">
+              검색 결과가 없습니다
+            </p>
+          </div>
+        ) : isFocused ? (
+          <div>
+            {!hasRecentDestinations ? (
+              <div className="py-12 px-4">
+                <p className="text-zinc-500 text-sm text-center">
+                  목적지를 검색하세요
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+                  <span className="text-zinc-500 text-xs font-medium uppercase tracking-wider">
+                    최근 검색
+                  </span>
                   <button
-                    onClick={onRemoveAllRecentDestinations}
+                    onClick={handleRemoveAllRecentDestinations}
                     onMouseDown={(event) => event.preventDefault()}
-                    className="text-xs font-medium text-white/40 hover:text-white/70 
-                    px-2.5 py-1 rounded-full hover:bg-white/5 transition-all duration-200"
+                    className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
                   >
                     모두 삭제
                   </button>
                 </div>
-              )}
-              <div className="space-y-2 max-h-64 overflow-y-auto mb-3">
-                {recentDestinations.map((destination: string) => (
-                  <DestinationSelectButton
-                    key={destination}
-                    onClick={() => handleSelect(destination)}
-                    destination={destination}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : null}
-        </div>
+                <div className="max-h-64 overflow-y-auto p-2">
+                  <div className="space-y-0.5">
+                    {recentDestinations.map((destination: string) => (
+                      <DestinationSelectButton
+                        key={destination}
+                        onClick={() => handleSelect(destination)}
+                        destination={destination}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        ) : null}
+      </div>
 
-        {/* 검색 입력 필드 */}
+      {/* 검색 입력 필드 */}
+      <div className="p-2">
         <DestinationInput
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}

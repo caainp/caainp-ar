@@ -11,8 +11,8 @@ export default function DestinationInput({
 }) {
   return (
     <div className="relative">
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-        <Search size={20} />
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
+        <Search size={18} />
       </div>
       <input
         type="text"
@@ -20,9 +20,9 @@ export default function DestinationInput({
         onChange={(e) => setSearchQuery(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        placeholder="목적지 검색..."
-        className="w-full bg-white/10 border border-white/20 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-400 
-      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+        placeholder="목적지 검색"
+        className="w-full bg-zinc-800 rounded-lg py-3 pl-10 pr-4 text-zinc-100 text-sm placeholder-zinc-500 
+          focus:outline-none focus:ring-1 focus:ring-zinc-600 transition-all"
       />
     </div>
   );
