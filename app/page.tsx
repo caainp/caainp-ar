@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Overlay from "./components/overlay";
 
 const Scene = dynamic(() => import("./components/Scene"), {
   ssr: false,
@@ -8,7 +9,12 @@ const Scene = dynamic(() => import("./components/Scene"), {
 });
 
 export const App = () => {
-  return <Scene />;
+  return (
+    <>
+      <Overlay />
+      {/* <Scene /> */}
+    </>
+  );
 };
 
 export default App;

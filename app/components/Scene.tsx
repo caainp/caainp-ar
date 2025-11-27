@@ -96,7 +96,7 @@ const ARComponent = () => {
           >
             {/* @ts-ignore */}
             <a-camera gps-camera rotation-reader></a-camera>
-            {boxes.map((box) => (
+            {/* {boxes.map((box) => (
               // @ts-ignore
               <a-box
                 key={box.id}
@@ -105,7 +105,7 @@ const ARComponent = () => {
                 scale="0.5 0.5 0.5"
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"
               />
-            ))}
+            ))} */}
             {/* @ts-ignore */}
           </a-scene>
         </div>
