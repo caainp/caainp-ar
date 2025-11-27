@@ -2,6 +2,23 @@
 
 import { DirectionType, NavData } from "../components/overlay/types";
 
+const RANDOM_TEXT_KO = [
+  "테스트 문구 1 입니다.",
+  "테스트 문구 2 입니다.",
+  "테스트 문구 3 입니다.",
+  "테스트 문구 4 입니다.",
+  "테스트 문구 5 입니다.",
+];
+
+const RANDOM_DIRECTION_TYPE = [
+  "STRAIGHT",
+  "LEFT",
+  "RIGHT",
+  "TURN_BACK",
+  "STAIRS_UP",
+  "STAIRS_DOWN",
+];
+
 /**
  * 목적지 계산
  * @param formData - 목적지/이미지를 담은 FormData
@@ -34,9 +51,12 @@ export async function calculateDestination(
     current_node: 4106,
     next_node: 4103,
     move_instruction: {
-      direction_type: "TURN_BACK" as DirectionType,
+      direction_type: RANDOM_DIRECTION_TYPE[
+        Math.floor(Math.random() * RANDOM_DIRECTION_TYPE.length)
+      ] as DirectionType,
       angle_deg: 30.0,
-      text_ko: "오른쪽 복도로 이동하세요.",
+      text_ko:
+        RANDOM_TEXT_KO[Math.floor(Math.random() * RANDOM_TEXT_KO.length)],
     },
     route_summary: {
       current_step: 1,
