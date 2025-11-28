@@ -2,12 +2,12 @@
 
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { animate, createScope, stagger } from "animejs"; // animejs import
-import DestinationSelectButton from "./DestinationSelectButton";
 import DestinationInput from "./DestinationInput";
 import { useOverlayContext } from "./OverlayContext";
+import DestinationSearchContent from "./DestinationSearchContent";
 
 // TODO: 임시 목적지 목록
-const SAMPLE_DESTINATIONS = [
+export const SAMPLE_DESTINATIONS = [
   "401호 강의실",
   "402호 강의실",
   "403호 강의실",
@@ -109,74 +109,6 @@ export default function DestinationSearch() {
     isFocused,
   ]);
 
-  // 렌더링 헬퍼 함수
-  const renderContent = () => {
-    switch (viewState) {
-      case "results":
-        return (
-          <div className="max-h-72 overflow-y-auto p-2">
-            <div className="space-y-0.5">
-              {filteredDestinations.map((destination) => (
-                <div key={destination} className="anim-item">
-                  <DestinationSelectButton
-                    onClick={() => handleSelect(destination)}
-                    destination={destination}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      case "empty":
-        return (
-          <div className="py-12 px-4 fade-in">
-            <p className="text-zinc-500 text-sm text-center">
-              검색 결과가 없습니다
-            </p>
-          </div>
-        );
-      case "recent":
-        return (
-          <div>
-            <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-              <span className="text-zinc-500 text-xs font-medium uppercase tracking-wider">
-                최근 검색
-              </span>
-              <button
-                onClick={handleRemoveAllRecentDestinations}
-                onMouseDown={(event) => event.preventDefault()}
-                className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
-              >
-                모두 삭제
-              </button>
-            </div>
-            <div className="max-h-64 overflow-y-auto p-2">
-              <div className="space-y-0.5">
-                {recentDestinations.map((destination: string) => (
-                  <div key={destination} className="anim-item opacity-0">
-                    <DestinationSelectButton
-                      onClick={() => handleSelect(destination)}
-                      destination={destination}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      case "instruction":
-        return (
-          <div className="py-12 px-4 fade-in">
-            <p className="text-zinc-500 text-sm text-center">
-              목적지를 검색하세요
-            </p>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <div
       ref={rootRef}
@@ -198,7 +130,15 @@ export default function DestinationSearch() {
         className="overflow-hidden bg-zinc-900"
         style={{ height: 0 }}
       >
-        <div ref={listRef}>{renderContent()}</div>
+        <div ref={listRef}>
+          <DestinationSearchContent
+            viewState={viewState}
+            filteredDestinations={filteredDestinations}
+            recentDestinations={recentDestinations}
+            onSelectDestination={handleSelect}
+            onRemoveAllRecentDestinations={handleRemoveAllRecentDestinations}
+          />
+        </div>
       </div>
     </div>
   );
