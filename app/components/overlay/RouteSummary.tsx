@@ -389,7 +389,7 @@ function RouteSummary() {
       className="route-container w-full px-4 py-3 cursor-pointer select-none border-t border-zinc-800"
       onClick={handleToggleSpread}
     >
-      {/* 진행률 헤더 */}
+      {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
