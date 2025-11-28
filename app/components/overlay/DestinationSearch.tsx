@@ -33,6 +33,7 @@ export default function DestinationSearch() {
   } = useOverlayContext();
   const [searchQuery, setSearchQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // 애니메이션을 위한 Refs
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,6 +48,7 @@ export default function DestinationSearch() {
     handleSelectDestination(destination);
     setSearchQuery("");
     setIsFocused(false);
+    inputRef.current?.blur();
   };
 
   const hasSearchResults =
@@ -183,6 +185,7 @@ export default function DestinationSearch() {
       {/* 검색 입력 필드 */}
       <div className="p-2 relative z-10 bg-zinc-900">
         <DestinationInput
+          inputRef={inputRef as React.RefObject<HTMLInputElement>}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           setIsFocused={setIsFocused}

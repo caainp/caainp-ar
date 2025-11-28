@@ -1,10 +1,12 @@
 import { Search } from "./Icons";
 
 export default function DestinationInput({
+  inputRef,
   searchQuery,
   setSearchQuery,
   setIsFocused,
 }: {
+  inputRef: React.RefObject<HTMLInputElement>;
   searchQuery: string;
   setSearchQuery: (value: string) => void;
   setIsFocused: (value: boolean) => void;
@@ -16,6 +18,7 @@ export default function DestinationInput({
       </div>
       <input
         type="text"
+        ref={inputRef}
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         onFocus={() => setIsFocused(true)}
