@@ -18,32 +18,32 @@ const ANIMATION_CONFIG = {
   SPREAD: {
     container: {
       duration: 450,
-      ease: "out(4)",
+      ease: "outExpo",
       marginTop: "8px",
       paddingTop: "8px",
     },
     stepItems: {
       duration: 400,
       staggerDelay: 50,
-      ease: "out(3)",
-      scale: [0.95, 1] as [number, number],
+      ease: "outExpo",
+      scale: [1, 1] as [number, number],
     },
   },
   FOLD: {
     container: {
       duration: 450,
-      ease: "inOut(3)",
+      ease: "outExpo",
     },
     stepItems: {
       duration: 300,
       staggerDelay: 30,
-      ease: "out(2)",
-      translateY: [0, -8] as [number, number],
-      scale: [1, 0.95] as [number, number],
+      ease: "outExpo",
+      translateY: [0, 0] as [number, number],
+      scale: [1, 1] as [number, number],
     },
     collapsedInfo: {
       duration: 350,
-      ease: "out(3)",
+      ease: "outExpo",
       delayOffset: 200,
     },
     maxDelay: 150,
@@ -52,25 +52,25 @@ const ANIMATION_CONFIG = {
   FADE_IN: {
     container: {
       duration: 500,
-      ease: "out(3)",
+      ease: "outExpo",
       translateY: [20, 0] as [number, number],
     },
     stepItems: {
       duration: 400,
       staggerDelay: 100,
       staggerStart: 200,
-      ease: "out(3)",
-      translateX: [-20, 0] as [number, number],
+      ease: "outExpo",
+      // translateX: [-20, 0] as [number, number],
     },
     progressBar: {
       duration: 800,
       delay: 400,
-      ease: "out(4)",
+      ease: "outExpo",
     },
   },
   LOADING: {
     duration: 1500,
-    ease: "inOut(2)",
+    ease: "outExpo",
   },
 };
 
@@ -304,7 +304,6 @@ function RouteSummary() {
 
         animateStepItems(".step-item", {
           opacity: [0, 1],
-          translateX: fadeInConfig.stepItems.translateX,
           duration: fadeInConfig.stepItems.duration,
           delay: stagger(fadeInConfig.stepItems.staggerDelay, {
             start: fadeInConfig.stepItems.staggerStart,

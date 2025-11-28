@@ -167,7 +167,7 @@ export default function CameraOffBackground() {
       </div>
 
       {/* Foreground Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center w-full h-full space-y-6">
+      <div className="relative flex flex-col items-center justify-center w-full h-full space-y-6">
         {/* Icon Container */}
         <div className="relative group">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-indigo-500/30 rounded-full blur-3xl group-hover:bg-indigo-400/40 transition-colors duration-500" />

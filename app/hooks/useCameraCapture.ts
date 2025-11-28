@@ -9,7 +9,7 @@ type CaptureOptions = {
    */
   download?: boolean;
   /**
-   * 다운로드 파일명 (download=true일 때만 사용)
+   * 다운로드 파일명
    */
   filename?: string;
 };

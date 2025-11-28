@@ -1,26 +1,33 @@
-import React, { useEffect } from "react";
-import { animate } from "animejs";
+import React, { useEffect, useRef } from "react";
+import { animate, createScope } from "animejs";
 
 export default function NavigationCardLoading() {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const scopeRef = useRef<ReturnType<typeof createScope> | null>(null);
+
   useEffect(() => {
-    animate(".loading-spinner", {
-      rotate: 360,
-      duration: 1000,
-      loop: true,
-      ease: "linear",
+    scopeRef.current = createScope({ root: rootRef }).add((self) => {
+      animate(".loading-spinner", {
+        rotate: 360,
+        duration: 1000,
+        loop: true,
+        ease: "linear",
+      });
+
+      animate(".loading-pulse", {
+        opacity: [0.3, 1, 0.3],
+        scale: [1],
+        duration: 1000,
+        loop: true,
+        ease: "inOut(2)",
+      });
     });
 
-    animate(".loading-pulse", {
-      opacity: [0.3, 1, 0.3],
-      scale: [1],
-      duration: 1000,
-      loop: true,
-      ease: "inOut(2)",
-    });
+    return () => scopeRef.current?.revert();
   }, []);
 
   return (
-    <div className="flex items-center gap-4">
+    <div ref={rootRef} className="flex items-center gap-4">
       {/* 아이콘 영역 - 플랫한 원형 인디케이터 */}
       <div className="shrink-0 w-14 h-14 rounded-xl bg-zinc-800 ring-1 ring-zinc-700 flex items-center justify-center">
         <div className="relative w-7 h-7">

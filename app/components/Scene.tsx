@@ -14,7 +14,6 @@ const ARComponent = () => {
         strategy="afterInteractive"
         onLoad={() => setAframeLoaded(true)}
       />
-
       {aframeLoaded && (
         <Script
           src="https://raw.githack.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.min.js"
@@ -22,7 +21,6 @@ const ARComponent = () => {
           onLoad={() => setArjsLoaded(true)}
         />
       )}
-
       {arjsLoaded && (
         <Script
           src="https://raw.githack.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"

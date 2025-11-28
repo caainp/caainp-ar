@@ -49,6 +49,9 @@ export default function Overlay() {
   const [isLoadingDestination, setIsLoadingDestination] = useState(false);
 
   const handleSelectDestination = async (destination: string) => {
+    // 초기화
+    setNavData(initialNavData);
+
     setIsLoadingDestination(true);
 
     // 이미 최근 검색에 있는 목적지라면 제거 하고 최근 검색 목록의 맨 앞에 추가
@@ -139,21 +142,25 @@ export default function Overlay() {
         handleDebugCapture,
       }}
     >
-      <div className="fixed inset-0 pointer-events-none z-50 flex flex-col justify-between p-4 font-sans antialiased text-white">
+      <div className="fixed inset-0 pointer-events-none flex flex-col justify-between p-4 font-sans antialiased text-white">
+        <DestinationSearch />
         {/* AR Viewport */}
         <div className="flex-1 flex items-center justify-center opacity-30 pointer-events-none" />
 
         {/* Debug */}
-        <div className="absolute top-4 left-4 justify-center">
-          {debug && <Debug />}
-        </div>
-
-        {/* 목적지가 없으면 검색 UI, 있으면 네비게이션 카드 표시 */}
-        {isLoadingDestination || navData.destination ? (
-          <NavigationCard />
-        ) : (
-          <DestinationSearch />
+        {navData.destination && (
+          <div className="relative mx-auto max-w-sm w-full z-50 pointer-events-auto mb-2 gap-2 flex flex-col">
+            <button
+              onClick={() => setDebug(!debug)}
+              className="bg-zinc-800 hover:bg-zinc-700 text-zinc-100 px-4 py-2 rounded-lg transition-colors cursor-pointer shadow-2xl shadow-zinc-900"
+            >
+              {debug ? "Debug Off" : "Debug On"}
+            </button>
+            {navData.destination && debug && <Debug />}
+          </div>
         )}
+        {/* 목적지가 없으면 검색 UI, 있으면 네비게이션 카드 표시 */}
+        {(isLoadingDestination || navData.destination) && <NavigationCard />}
       </div>
     </OverlayProvider>
   );

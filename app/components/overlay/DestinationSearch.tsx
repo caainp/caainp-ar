@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
-import { animate, stagger } from "animejs"; // animejs import
+import { animate, createScope, stagger } from "animejs"; // animejs import
 import DestinationSelectButton from "./DestinationSelectButton";
 import DestinationInput from "./DestinationInput";
 import { useOverlayContext } from "./OverlayContext";
@@ -37,7 +37,8 @@ export default function DestinationSearch() {
   // 애니메이션을 위한 Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-
+  const rootRef = useRef<HTMLDivElement>(null);
+  const scopeRef = useRef<ReturnType<typeof createScope> | null>(null);
   const filteredDestinations = SAMPLE_DESTINATIONS.filter((dest) =>
     dest.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -70,31 +71,34 @@ export default function DestinationSearch() {
   useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+    scopeRef.current = createScope({ root: rootRef }).add((self) => {
+      const targetHeight =
+        viewState === "hidden" ? 0 : listRef.current?.scrollHeight || 0;
 
-    const targetHeight =
-      viewState === "hidden" ? 0 : listRef.current?.scrollHeight || 0;
-
-    animate(container, {
-      height: targetHeight,
-      duration: 250,
-      easing: "easeOutQuad",
-    });
-
-    if (viewState === "results" || viewState === "recent") {
       animate(container, {
-        opacity: [0, 1],
+        height: targetHeight,
         duration: 250,
         easing: "easeOutQuad",
       });
-      animate(".anim-item", {
-        opacity: [0, 1],
-        translateY: [10, 0],
-        filter: ["blur(4px)", "blur(0px)"],
-        delay: stagger(30, { start: 50 }),
-        duration: 350,
-        easing: "easeOutQuad",
-      });
-    }
+
+      if (viewState === "results" || viewState === "recent") {
+        animate(container, {
+          opacity: [0, 1],
+          duration: 250,
+          easing: "easeOutQuad",
+        });
+        animate(".anim-item", {
+          opacity: [0, 1],
+          translateY: [10, 0],
+          filter: ["blur(4px)", "blur(0px)"],
+          delay: stagger(30, { start: 50 }),
+          duration: 350,
+          easing: "easeOutQuad",
+        });
+      }
+    });
+
+    return () => scopeRef.current?.revert();
   }, [
     viewState,
     filteredDestinations,
@@ -172,16 +176,10 @@ export default function DestinationSearch() {
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto pointer-events-auto bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl shadow-zinc-900">
-      {/* 동적 높이 컨테이너 */}
-      <div
-        ref={containerRef}
-        className="overflow-hidden bg-zinc-900"
-        style={{ height: 0 }}
-      >
-        <div ref={listRef}>{renderContent()}</div>
-      </div>
-
+    <div
+      ref={rootRef}
+      className="w-full max-w-sm mx-auto pointer-events-auto bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl shadow-zinc-900"
+    >
       {/* 검색 입력 필드 */}
       <div className="p-2 relative z-10 bg-zinc-900">
         <DestinationInput
@@ -189,6 +187,15 @@ export default function DestinationSearch() {
           setSearchQuery={setSearchQuery}
           setIsFocused={setIsFocused}
         />
+      </div>
+
+      {/* 동적 높이 컨테이너 */}
+      <div
+        ref={containerRef}
+        className="overflow-hidden bg-zinc-900"
+        style={{ height: 0 }}
+      >
+        <div ref={listRef}>{renderContent()}</div>
       </div>
     </div>
   );

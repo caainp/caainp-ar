@@ -61,7 +61,7 @@ export default function Debug() {
   };
 
   return (
-    <div className="flex flex-col bg-zinc-900 rounded-2xl p-3 gap-2">
+    <div className="flex flex-col bg-zinc-900 rounded-2xl p-3 gap-2 max-w-sm w-full mx-auto shadow-2xl shadow-zinc-900">
       <h2 className="text-lg font-bold">Debug Panel</h2>
       <div className="pointer-events-auto flex items-center gap-4">
         <button
