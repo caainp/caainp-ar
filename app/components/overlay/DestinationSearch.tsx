@@ -172,7 +172,7 @@ export default function DestinationSearch() {
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto pointer-events-auto bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl">
+    <div className="w-full max-w-sm mx-auto pointer-events-auto bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl shadow-zinc-900">
       {/* 동적 높이 컨테이너 */}
       <div
         ref={containerRef}

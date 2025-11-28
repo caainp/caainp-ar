@@ -1,12 +1,11 @@
 // components/ARComponent.tsx
 import { useState } from "react";
 import Script from "next/script";
-import { useARScreenCapture } from "../hooks/useARScreenCapture";
+import { useCameraCapture } from "../hooks/useCameraCapture";
 
 const ARComponent = () => {
   const [aframeLoaded, setAframeLoaded] = useState(false);
   const [arjsLoaded, setArjsLoaded] = useState(false);
-  const { captureScreen, isCapturing } = useARScreenCapture();
 
   return (
     <>

@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import Overlay from "./overlay";
 import { useEffect, useState } from "react";
+import Camera from "./Camera";
 
 const Scene = dynamic(() => import("./Scene"), {
   ssr: false,
@@ -11,9 +12,9 @@ const Scene = dynamic(() => import("./Scene"), {
 
 export default function SceneWithOverlay() {
   return (
-    <>
+    <Camera>
       <Overlay />
-      <Scene />
-    </>
+      {/* <Scene /> */}
+    </Camera>
   );
 }

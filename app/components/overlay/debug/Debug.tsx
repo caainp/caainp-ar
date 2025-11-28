@@ -1,9 +1,17 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Camera, Eye } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Camera,
+  Eye,
+  Video,
+  VideoOff,
+} from "lucide-react";
 import React, { useState } from "react";
-import { useARScreenCapture } from "@/app/hooks/useARScreenCapture";
+import { useCameraCapture } from "@/app/hooks/useCameraCapture";
 import { useOverlayContext } from "../OverlayContext";
+import { useCameraContext } from "@/app/components/Camera";
 
 export default function Debug() {
   const {
@@ -14,7 +22,8 @@ export default function Debug() {
   } = useOverlayContext();
   const currentStep = navData.route_summary.current_step;
   const totalSteps = navData.route_summary.total_steps;
-  const { captureScreen, isCapturing } = useARScreenCapture();
+  const { captureScreen, isCapturing } = useCameraCapture();
+  const { isWebcamEnabled, toggleWebcam } = useCameraContext();
   const [isUpdatingNav, setIsUpdatingNav] = useState(false);
 
   const handlePrevious = () => {
@@ -88,10 +97,22 @@ export default function Debug() {
         </button>
 
         <button
+          onClick={toggleWebcam}
+          className={`p-2 rounded-lg transition-colors ${
+            isWebcamEnabled
+              ? "bg-blue-500 hover:bg-blue-400 text-white cursor-pointer"
+              : "bg-zinc-700 hover:bg-zinc-600 text-zinc-300 cursor-pointer"
+          }`}
+          title={isWebcamEnabled ? "Webcam 끄기" : "Webcam 켜기"}
+        >
+          {isWebcamEnabled ? <Video size={20} /> : <VideoOff size={20} />}
+        </button>
+
+        <button
           onClick={handleCaptureAndUpdate}
-          disabled={isCaptureDisabled}
+          disabled={isCaptureDisabled || !isWebcamEnabled}
           className={`p-2 rounded-lg transition-colors flex items-center gap-2 ${
-            isCaptureDisabled
+            isCaptureDisabled || !isWebcamEnabled
               ? "bg-emerald-500/30 text-zinc-600 cursor-not-allowed"
               : "bg-emerald-500 hover:bg-emerald-400 text-white cursor-pointer"
           }`}

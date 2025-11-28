@@ -80,7 +80,7 @@ export default function NavigationCard() {
   return (
     <div
       ref={rootRef}
-      className="w-full max-w-sm mx-auto pointer-events-auto bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl"
+      className="w-full max-w-sm mx-auto pointer-events-auto bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl shadow-zinc-900"
     >
       {/* 메인 네비게이션 카드 */}
       <div className="p-4">
