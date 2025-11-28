@@ -13,14 +13,13 @@ interface FloatingShape {
   vy: number;
 }
 
-// 색상을 조금 더 밝은(Luminosity가 높은) 톤으로 변경하여 어둠 속에서 더 잘 보이게 함
 const COLORS = [
-  "#6366f1", // Indigo 500 (기존 600보다 밝음)
+  "#6366f1", // Indigo 500
   "#8b5cf6", // Violet 500
   "#ec4899", // Pink 500
   "#10b981", // Emerald 500
   "#3b82f6", // Blue 500
-  "#06b6d4", // Cyan 500 (추가: 발광 효과가 좋음)
+  "#06b6d4", // Cyan 500
 ];
 
 export default function CameraOffBackground() {
@@ -170,7 +169,8 @@ export default function CameraOffBackground() {
       <div className="relative flex flex-col items-center justify-center w-full h-full space-y-6">
         {/* Icon Container */}
         <div className="relative group">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-indigo-500/30 rounded-full blur-3xl group-hover:bg-indigo-400/40 transition-colors duration-500" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32
+           bg-indigo-500/30 rounded-full blur-3xl group-hover:bg-indigo-400/40 transition-colors duration-500" />
 
           <div
             className="relative flex items-center justify-center w-24 h-24 

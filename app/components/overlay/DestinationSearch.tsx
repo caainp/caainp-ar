@@ -5,6 +5,7 @@ import { animate, createScope, stagger } from "animejs"; // animejs import
 import DestinationInput from "./DestinationInput";
 import { useOverlayContext } from "./OverlayContext";
 import DestinationSearchContent from "./DestinationSearchContent";
+import SettingButton from "./setting/SettingButton";
 
 // TODO: 임시 목적지 목록
 export const SAMPLE_DESTINATIONS = [
@@ -115,13 +116,14 @@ export default function DestinationSearch() {
       className="w-full max-w-sm mx-auto pointer-events-auto bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl shadow-zinc-900"
     >
       {/* 검색 입력 필드 */}
-      <div className="p-2 relative z-10 bg-zinc-900">
+      <div className="p-2 relative z-10 bg-zinc-900 flex items-center gap-2">
         <DestinationInput
           inputRef={inputRef as React.RefObject<HTMLInputElement>}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           setIsFocused={setIsFocused}
         />
+        <SettingButton />
       </div>
 
       {/* 동적 높이 컨테이너 */}

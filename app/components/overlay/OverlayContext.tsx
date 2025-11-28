@@ -16,6 +16,10 @@ export interface OverlayContextValue {
   handleRemoveAllRecentDestinations: () => void;
   handleStepChange: (newStep: number) => void;
   handleDebugCapture: (captureImage: string) => Promise<void>;
+  setting: boolean;
+  setSetting: Dispatch<SetStateAction<boolean>>;
+  debug: boolean;
+  setDebug: Dispatch<SetStateAction<boolean>>;
 }
 
 const OverlayContext = createContext<OverlayContextValue | undefined>(

@@ -1,16 +1,9 @@
 "use client";
 
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  useMemo,
-  memo,
-} from "react";
-import { animate, createScope, stagger } from "animejs";
+import React, { useEffect, useRef, useState, useCallback, memo } from "react";
+import { animate, createScope, stagger, TweenParamValue } from "animejs";
 import RouteStep from "./RouteStep";
-import { Dot, ChevronDown } from "lucide-react";
+import RouteSummaryHeader from "./RouteSummaryHeader";
 import { useOverlayContext } from "./OverlayContext";
 
 // 애니메이션 상수
@@ -99,7 +92,7 @@ const animateStepItems = (
     translateY?: [number, number];
     translateX?: [number, number];
     duration: number;
-    delay: any;
+    delay: TweenParamValue;
     ease: string;
   }
 ) => {
@@ -126,11 +119,9 @@ function RouteSummary() {
   const [isSpread, setIsSpread] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const isManuallySpreadRef = useRef(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const currentStep = useMemo(() => {
-    return routeSummary.current_step;
-  }, [routeSummary.current_step]);
+  const currentStep = routeSummary.current_step;
 
   // 타이머 관리 헬퍼
   const clearTimer = useCallback(() => {
@@ -268,22 +259,31 @@ function RouteSummary() {
 
   // currentStep 변경 시 자동 펼침/접기 처리
   useEffect(() => {
-    // 사용자가 수동으로 펼친 상태였다면 자동 접기 타이머를 설정하지 않음
     if (isManuallySpreadRef.current) {
       clearTimer();
       return;
     }
 
     clearTimer();
-    handleSpread(true, false);
-    isManuallySpreadRef.current = false;
 
-    timerRef.current = setTimeout(() => {
+    let animationFrameId: number | null = null;
+
+    animationFrameId = requestAnimationFrame(() => {
+      handleSpread(true, false);
+      isManuallySpreadRef.current = false;
+
+      timerRef.current = setTimeout(() => {
+        clearTimer();
+        handleSpread(false, false);
+      }, AUTO_FOLD_DELAY);
+    });
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
       clearTimer();
-      handleSpread(false, false);
-    }, AUTO_FOLD_DELAY);
-
-    return clearTimer;
+    };
   }, [currentStep, handleSpread, clearTimer]);
 
   // 애니메이션 스코프 초기화
@@ -365,8 +365,9 @@ function RouteSummary() {
     }, 0);
 
     return () => clearTimeout(scrollTimer);
-  }, [currentStep, isSpread]);
+  }, [routeSummary.current_step, isSpread]);
 
+  
   useEffect(() => {
     return scrollToCurrentStep();
   }, [scrollToCurrentStep]);
@@ -390,33 +391,13 @@ function RouteSummary() {
       onClick={handleToggleSpread}
     >
       {/* 헤더 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
-            경로
-          </span>
-          <span className="text-xs text-zinc-600">
-            {routeSummary.current_step} / {routeSummary.total_steps}
-          </span>
-          <div
-            ref={collapsedInfoRef}
-            className="collapsed-info flex items-center gap-1"
-          >
-            <span>
-              <Dot size={10} className="text-zinc-600" />
-            </span>
-            <span className="text-xs font-medium text-zinc-300">
-              {currentStepText}
-            </span>
-          </div>
-        </div>
-        <ChevronDown
-          size={16}
-          className={`text-zinc-500 transition-transform ${
-            isSpread ? "rotate-180" : ""
-          }`}
-        />
-      </div>
+      <RouteSummaryHeader
+        collapsedInfoRef={collapsedInfoRef}
+        currentStep={routeSummary.current_step}
+        currentStepText={currentStepText}
+        isSpread={isSpread}
+        totalSteps={routeSummary.total_steps}
+      />
 
       {/* 경로 단계들 */}
       <div

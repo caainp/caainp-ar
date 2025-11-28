@@ -1,12 +1,13 @@
 "use client";
 
-import React, { Dispatch, SetStateAction, useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import NavigationCard from "./NavigationCard";
 import DestinationSearch from "./DestinationSearch";
 import Debug from "./debug/Debug";
 import { NavData } from "./types";
 import { calculateDestination } from "@/app/lib/action";
 import { OverlayProvider } from "./OverlayContext";
+import SettingWrapper from "./setting/SettingWrapper";
 
 const dataUrlToFile = (dataUrl: string, filename: string) => {
   const [header, data] = dataUrl.split(",");
@@ -43,8 +44,8 @@ const initialNavData: NavData = {
 
 export default function Overlay() {
   const [debug, setDebug] = useState(true);
+  const [setting, setSetting] = useState(false);
   const [navData, setNavData] = useState<NavData>(initialNavData);
-
   const [recentDestinations, setRecentDestinations] = useState<string[]>([]);
   const [isLoadingDestination, setIsLoadingDestination] = useState(false);
 
@@ -140,16 +141,20 @@ export default function Overlay() {
         handleRemoveAllRecentDestinations,
         handleStepChange,
         handleDebugCapture,
+        setting,
+        setSetting,
+        debug,
+        setDebug,
       }}
     >
-      <div className="fixed inset-0 pointer-events-none flex flex-col justify-between p-4 font-sans antialiased text-white">
+      <div className="fixed inset-0 flex flex-col justify-between p-4 font-sans antialiased text-white">
         <DestinationSearch />
         {/* AR Viewport */}
-        <div className="flex-1 flex items-center justify-center opacity-30 pointer-events-none" />
+        <div className="flex-1 flex items-center justify-center opacity-30" />
 
         {/* Debug */}
         {navData.destination && (
-          <div className="relative mx-auto max-w-sm w-full z-50 pointer-events-auto mb-2 gap-2 flex flex-col">
+          <div className="relative mx-auto max-w-sm w-full pointer-events-auto mb-2 gap-2 flex flex-col">
             <button
               onClick={() => setDebug(!debug)}
               className="bg-zinc-800 hover:bg-zinc-700 text-zinc-100 px-4 py-2 rounded-lg transition-colors cursor-pointer shadow-2xl shadow-zinc-900"
@@ -161,6 +166,7 @@ export default function Overlay() {
         )}
         {/* 목적지가 없으면 검색 UI, 있으면 네비게이션 카드 표시 */}
         {(isLoadingDestination || navData.destination) && <NavigationCard />}
+        {setting && <SettingWrapper />}
       </div>
     </OverlayProvider>
   );
