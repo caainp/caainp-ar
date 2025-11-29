@@ -113,10 +113,11 @@ export default function DestinationSearch() {
   return (
     <div
       ref={rootRef}
-      className="w-full max-w-sm mx-auto pointer-events-auto bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl shadow-zinc-900"
+      className="w-full max-w-sm mx-auto pointer-events-auto bg-(--bg-card) rounded-3xl overflow-hidden shadow-2xl/30
+      ring-1 ring-(--bg-secondary)/70"
     >
       {/* 검색 입력 필드 */}
-      <div className="p-2 relative z-10 bg-zinc-900 flex items-center gap-2">
+      <div className="p-2 relative z-10 bg-(--bg-card) flex items-center gap-2">
         <DestinationInput
           inputRef={inputRef as React.RefObject<HTMLInputElement>}
           searchQuery={searchQuery}
@@ -129,9 +130,11 @@ export default function DestinationSearch() {
       {/* 동적 높이 컨테이너 */}
       <div
         ref={containerRef}
-        className="overflow-hidden bg-zinc-900"
+        className="relative overflow-hidden bg-(--bg-card)"
         style={{ height: 0 }}
       >
+        {/* 상단 약간 그림자 */}
+        {/* <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-zinc-900 to-transparent" /> */}
         <div ref={listRef}>
           <DestinationSearchContent
             viewState={viewState}

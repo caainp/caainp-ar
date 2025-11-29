@@ -8,7 +8,7 @@ export default function SettingWrapper() {
   return <div className="absolute inset-0">
     {/* Background */}
     <div
-      className="absolute inset-0 z-2 bg-black/40 backdrop-blur-4xl "
+      className="absolute inset-0 z-2 bg-(--bg-base)/40 backdrop-blur-4xl "
       onClick={() => setSetting(false)}
     ></div>
     {/* Content */}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import NavigationCard from "./NavigationCard";
 import DestinationSearch from "./DestinationSearch";
 import Debug from "./debug/Debug";
@@ -8,6 +8,7 @@ import { NavData } from "./types";
 import { calculateDestination } from "@/app/lib/action";
 import { OverlayProvider } from "./OverlayContext";
 import SettingWrapper from "./setting/SettingWrapper";
+import RouteSummary from "./RouteSummary";
 
 const dataUrlToFile = (dataUrl: string, filename: string) => {
   const [header, data] = dataUrl.split(",");
@@ -48,6 +49,7 @@ export default function Overlay() {
   const [navData, setNavData] = useState<NavData>(initialNavData);
   const [recentDestinations, setRecentDestinations] = useState<string[]>([]);
   const [isLoadingDestination, setIsLoadingDestination] = useState(false);
+  const [palette, setPalette] = useState<string>("soft");
 
   const handleSelectDestination = async (destination: string) => {
     // 초기화
@@ -104,7 +106,7 @@ export default function Overlay() {
       }
 
       // setIsLoadingDestination(true);
-      const destinationLabel = navData.destination ?? "AR 캡처 기반 목적지";
+      const destinationLabel = navData.destination ?? "DESTINATION";
 
       try {
         const formData = new FormData();
@@ -118,13 +120,37 @@ export default function Overlay() {
         const newNavData = await calculateDestination(formData);
         setNavData(newNavData);
       } catch (error) {
-        console.error("캡처 기반 경로 계산 실패:", error);
+        console.error("Debug Capture Error:", error);
       } finally {
         // setIsLoadingDestination(false);
       }
     },
     [navData.destination]
   );
+
+  const handleDebugUpdateNav = useCallback(
+    async () => {
+      const destinationLabel = navData.destination ?? "DESTINATION";
+
+      try {
+        const formData = new FormData();
+        formData.append("destination", destinationLabel);
+        const newNavData = await calculateDestination(formData);
+        setNavData(newNavData);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [navData.destination]
+  );
+
+  useEffect(() => {
+    if (palette === "default") {
+      document.documentElement.removeAttribute("data-palette");
+    } else {
+      document.documentElement.setAttribute("data-palette", palette);
+    }
+  }, [palette]);
 
   return (
     <OverlayProvider
@@ -145,29 +171,40 @@ export default function Overlay() {
         setSetting,
         debug,
         setDebug,
+        handleDebugUpdateNav,
+        palette,
+        setPalette,
       }}
     >
-      <div className="fixed inset-0 flex flex-col justify-between p-4 font-sans antialiased text-white">
-        <DestinationSearch />
-        {/* AR Viewport */}
-        <div className="flex-1 flex items-center justify-center opacity-30" />
+      <>
+        <div className="absolute top-0 left-0 right-0 h-fit text-(--text-white)">
+          {!(navData.destination || isLoadingDestination) && (
+            <div className="p-4">
+              <DestinationSearch />
+            </div>
+          )}
+          {(isLoadingDestination || navData.destination) && <NavigationCard />}
+        </div>
 
-        {/* Debug */}
-        {navData.destination && (
-          <div className="relative mx-auto max-w-sm w-full pointer-events-auto mb-2 gap-2 flex flex-col">
-            <button
-              onClick={() => setDebug(!debug)}
-              className="bg-zinc-800 hover:bg-zinc-700 text-zinc-100 px-4 py-2 rounded-lg transition-colors cursor-pointer shadow-2xl shadow-zinc-900"
-            >
-              {debug ? "Debug Off" : "Debug On"}
-            </button>
-            {navData.destination && debug && <Debug />}
-          </div>
-        )}
-        {/* 목적지가 없으면 검색 UI, 있으면 네비게이션 카드 표시 */}
-        {(isLoadingDestination || navData.destination) && <NavigationCard />}
         {setting && <SettingWrapper />}
-      </div>
+
+        <div className="absolute bottom-0 left-0 right-0 h-fit flex flex-col justify-between font-sans antialiased text-(--text-white)">
+          {/* Debug */}
+          {navData.destination && (
+            <div className="relative mx-auto max-w-sm w-full pointer-events-auto mb-2 p-4 gap-2 flex flex-col">
+              {/* <button
+                onClick={() => setDebug(!debug)}
+                className="bg-(--bg-secondary) hover:bg-(--bg-hover) text-(--text-primary) px-4 py-2 rounded-lg transition-colors cursor-pointer shadow-2xl shadow-(--bg-card)"
+              >
+                {debug ? "Debug Off" : "Debug On"}
+              </button> */}
+              {navData.destination && debug && <Debug />}
+            </div>
+          )}
+
+          {navData.destination && <RouteSummary />}
+        </div>
+      </>
     </OverlayProvider>
   );
 }

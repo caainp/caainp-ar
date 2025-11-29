@@ -19,54 +19,77 @@ export default function RouteStep({
     <div
       key={index}
       data-step-index={index}
-      className={`step-item flex items-center rounded-lg transition-all duration-200 ${
-        isCurrent
-          ? "bg-zinc-800 p-2.5 gap-3"
-          : isCompleted
-          ? "opacity-50 py-1.5 px-2 gap-2"
-          : "opacity-30 py-1.5 px-2 gap-2"
-      }`}
+      className="step-item flex gap-3 transition-all duration-200"
     >
-      <div
-        className={`shrink-0 rounded-full flex items-center justify-center transition-all duration-200 ${
-          isCurrent ? "w-5 h-5" : "w-4 h-4"
-        } ${
-          isCompleted
-            ? "bg-zinc-500 text-zinc-900"
-            : isCurrent
-            ? "bg-zinc-600 text-zinc-200"
-            : isLast
-            ? "bg-zinc-700 text-zinc-400"
-            : "bg-zinc-800 text-zinc-500"
-        }`}
-      >
-        {isCompleted ? (
-          <CheckCircle size={isCurrent ? 12 : 10} />
-        ) : isLast ? (
-          <Flag size={isCurrent ? 10 : 8} />
-        ) : (
-          <Circle size={isCurrent ? 8 : 6} />
+      {/* 왼쪽: 인디케이터 + 연결선 */}
+      <div className="flex flex-col items-center">
+        {/* 스텝 인디케이터 */}
+        <div
+          className={`shrink-0 rounded-full flex items-center justify-center transition-all duration-300
+            ${isCurrent ? "w-5 h-5 ring-4 ring-(--action-primary)/20" : "w-5 h-5"}
+            ${
+              isCompleted
+                ? "bg-(--action-success) text-(--text-white)"
+                : isCurrent
+                ? "bg-(--action-primary) text-(--text-white) shadow-md shadow-(--action-primary)/30"
+                : isLast
+                ? "bg-(--bg-tertiary) text-(--text-tertiary)"
+                : "bg-(--bg-secondary) text-(--text-muted) ring-1 ring-(--border-primary)"
+            }`}
+        >
+          {isCompleted ? (
+            <CheckCircle size={12} />
+          ) : isLast ? (
+            <Flag size={isCurrent ? 14 : 10} />
+          ) : isCurrent ? (
+            <div className="w-2.5 h-2.5 bg-white rounded-full" />
+          ) : (
+            <Circle size={6} />
+          )}
+        </div>
+
+        {/* 연결선 (마지막 아이템 제외) */}
+        {!isLast && (
+          <div
+            className={`w-0.5 flex-1 min-h-4 rounded-full transition-colors duration-300
+              ${isCompleted ? "bg-(--action-success)" : "bg-(--border-primary)"}`}
+          />
         )}
       </div>
 
-      {/* 단계 텍스트 */}
-      <span
-        className={`font-medium transition-all duration-200 ${
-          isCurrent
-            ? "text-sm text-zinc-100"
-            : isCompleted
-            ? "text-xs text-zinc-500 line-through"
-            : "text-xs text-zinc-500"
-        }`}
+      {/* 오른쪽: 콘텐츠 */}
+      <div
+        className={`flex-1 pb-4 transition-all duration-200
+          ${isLast ? "pb-0" : ""}`}
       >
-        {step}
-      </span>
+        {/* 현재 단계 배지 */}
+        {isCurrent && (
+          <span className="inline-block text-[10px] font-bold uppercase tracking-wider mb-1 px-2 py-0.5 rounded-full text-(--action-primary) bg-(--action-primary)/10">
+            현재 위치
+          </span>
+        )}
 
-      {isCurrent && (
-        <span className="ml-auto text-xs font-medium text-zinc-400 bg-zinc-700 px-2 py-0.5 rounded">
-          현재
-        </span>
-      )}
+        {/* 단계 텍스트 */}
+        <p
+          className={`font-medium transition-all duration-200 leading-snug m-0
+            ${
+              isCurrent
+                ? "text-base text-(--text-primary)"
+                : isCompleted
+                ? "text-sm text-(--text-muted) line-through decoration-1"
+                : "text-sm text-(--text-tertiary)"
+            }`}
+        >
+          {step}
+        </p>
+
+        {/* 완료 표시 */}
+        {isCompleted && (
+          <span className="text-[10px] text-(--action-success) mt-0.5 block">
+            완료
+          </span>
+        )}
+      </div>
     </div>
   );
 }

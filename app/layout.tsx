@@ -23,6 +23,11 @@ export const seoulNotice = localFont({
   variable: "--font-seoul-notice",
 });
 
+export const pretendard = localFont({
+  src: "./fonts/PretendardVariable.ttf",
+  variable: "--font-pretendard",
+});
+
 export const viewport = {
   width: "device-width",
   initialScale: 1,
@@ -38,7 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${seoulNotice.variable} antialiased m-0 overflow-hidden`}
+        className={`antialiased m-0 overflow-hidden ${pretendard.variable} ${pretendard.className}`}
       >
         {children}
       </body>

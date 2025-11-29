@@ -7,8 +7,9 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Caanip",
     start_url: "/",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#000000",
+    // 참고: CSS 변수 --manifest-bg와 --manifest-theme 참조 (globals.css)
+    background_color: "#ffffff", // --manifest-bg
+    theme_color: "#000000", // --manifest-theme
     icons: [],
   };
 }

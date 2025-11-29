@@ -13,47 +13,24 @@ interface FloatingShape {
   vy: number;
 }
 
-const COLORS = [
-  "#6366f1", // Indigo 500
-  "#8b5cf6", // Violet 500
-  "#ec4899", // Pink 500
-  "#10b981", // Emerald 500
-  "#3b82f6", // Blue 500
-  "#06b6d4", // Cyan 500
-];
+const getEffectColors = (): string[] => {
+  if (typeof window === "undefined") return [];
+  const root = document.documentElement;
+  return [
+    getComputedStyle(root).getPropertyValue("--effect-indigo").trim() || "#6366f1",
+    getComputedStyle(root).getPropertyValue("--effect-violet").trim() || "#8b5cf6",
+    getComputedStyle(root).getPropertyValue("--effect-pink").trim() || "#ec4899",
+    getComputedStyle(root).getPropertyValue("--effect-emerald").trim() || "#10b981",
+    getComputedStyle(root).getPropertyValue("--effect-blue").trim() || "#3b82f6",
+    getComputedStyle(root).getPropertyValue("--effect-cyan").trim() || "#06b6d4",
+  ];
+};
 
 export default function CameraOffBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shapesRef = useRef<FloatingShape[]>([]);
   const animationFrameRef = useRef<number>(0);
   const { enableWebcam } = useCameraContext();
-  const [isRequesting, setIsRequesting] = useState(false);
-
-  const handleActivate = async () => {
-    if (isRequesting) return;
-
-    setIsRequesting(true);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: 1920,
-          height: 1080,
-          facingMode: "environment",
-        },
-      });
-
-      stream.getTracks().forEach((track) => track.stop());
-
-      enableWebcam();
-    } catch (error) {
-      console.error("카메라 권한 요청 실패:", error);
-      alert(
-        "카메라 권한이 필요합니다. 브라우저 설정에서 카메라 권한을 허용해주세요."
-      );
-    } finally {
-      setIsRequesting(false);
-    }
-  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -74,11 +51,12 @@ export default function CameraOffBackground() {
 
     const initShapes = () => {
       const count = 7;
+      const colors = getEffectColors();
       shapesRef.current = Array.from({ length: count }, () => ({
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
         radius: 200 + Math.random() * 300,
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        color: colors[Math.floor(Math.random() * colors.length)] || "#6366f1",
         vx: (Math.random() - 0.5) * 0.8,
         vy: (Math.random() - 0.5) * 0.8,
       }));
@@ -135,7 +113,7 @@ export default function CameraOffBackground() {
   }, []);
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-slate-950 border border-slate-800/90">
+    <div className="relative w-full h-full overflow-hidden bg-(--bg-surface) border border-(--bg-surface-alt)/90">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full pointer-events-none"
@@ -170,22 +148,22 @@ export default function CameraOffBackground() {
         {/* Icon Container */}
         <div className="relative group">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32
-           bg-indigo-500/30 rounded-full blur-3xl group-hover:bg-indigo-400/40 transition-colors duration-500" />
+           bg-(--action-accent)/30 rounded-full blur-3xl group-hover:bg-(--action-accent-hover)/40 transition-colors duration-500" />
 
           <div
             className="relative flex items-center justify-center w-24 h-24 
-              bg-slate-900/40 
+              bg-(--bg-surface-alt)/40 
               shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] 
               rounded-full 
               backdrop-blur-xl 
-              border border-white/10 
-              group-hover:border-white/25
+              border border-(--border-light) 
+              group-hover:border-(--border-medium)
               transition-all duration-500 group-hover:scale-105"
           >
-            <div className="absolute inset-0 rounded-full bg-linear-to-tr from-white/5 to-transparent opacity-100" />
+            <div className="absolute inset-0 rounded-full bg-linear-to-tr from-(--border-subtle) to-transparent opacity-100" />
 
             <CameraOff
-              className="w-10 h-10 text-slate-300 group-hover:text-white transition-colors duration-500"
+              className="w-10 h-10 text-(--text-slate-mid) group-hover:text-(--text-white) transition-colors duration-500"
               strokeWidth={1.5}
             />
           </div>
@@ -193,19 +171,18 @@ export default function CameraOffBackground() {
 
         {/* Text Group */}
         <div className="text-center space-y-2">
-          <h3 className="text-xl font-medium text-slate-100 tracking-tight drop-shadow-lg">
+          <h3 className="text-xl font-medium text-(--text-slate-light) tracking-tight drop-shadow-lg">
             카메라가 꺼져있습니다
           </h3>
           <button
-            onClick={handleActivate}
-            disabled={isRequesting}
-            className="text-sm text-slate-300 font-normal tracking-wide drop-shadow-md 
-              hover:text-white underline cursor-pointer
+            onClick={() => enableWebcam()}
+            className="text-sm text-(--text-slate-mid) font-normal tracking-wide drop-shadow-md 
+              hover:text-(--text-white) underline cursor-pointer
               transition-all duration-300 
               disabled:opacity-50 disabled:cursor-not-allowed
-              focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-950 rounded px-2 py-1"
+              focus:outline-none focus:ring-2 focus:ring-(--action-accent) focus:ring-offset-2 focus:ring-offset-(--bg-surface) rounded px-2 py-1"
           >
-            {isRequesting ? "요청 중..." : "활성화하기"}
+            활성화하기
           </button>
         </div>
       </div>

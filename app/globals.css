@@ -1,8 +1,206 @@
 @import "tailwindcss";
 
+/**
+ * 프로젝트 색상 시스템
+ * 
+ * 이 파일에는 프로젝트 전체에서 사용되는 모든 색상이 CSS 변수로 정의되어 있습니다.
+ * 색상을 변경하려면 이 파일의 변수 값만 수정하면 됩니다.
+ * 
+ * 사용 예시:
+ * - CSS: background-color: var(--bg-primary);
+ * - 인라인 스타일: style={{ backgroundColor: 'var(--bg-primary)' }}
+ * - Tailwind arbitrary values: bg-[var(--bg-primary)]
+ * 
+ * 색상 카테고리:
+ * - 배경 색상: --bg-*
+ * - 텍스트 색상: --text-*
+ * - 경계선/링 색상: --border-*, --ring-*
+ * - 액션 색상: --action-*
+ * - 효과 색상: --effect-*
+ * - 스크롤바 색상: --scrollbar-*
+ */
+
 :root {
+  /* 기본 색상 */
   --background: #ffffff;
   --foreground: #171717;
+
+  /* 배경 색상 계열 */
+  --bg-base: #0a0a0a;
+  --bg-primary: #18181b; /* zinc-900 */
+  --bg-secondary: #27272a; /* zinc-800 */
+  --bg-tertiary: #3f3f46; /* zinc-700 */
+  --bg-input: #27272a; /* zinc-800 */
+  --bg-hover: #3f3f46; /* zinc-700 */
+  --bg-card: #27272a; /* zinc-800 */
+  --bg-bottom-card: #18181b; /* zinc-900 */
+  --bg-surface: #0f172a; /* slate-950 */
+  --bg-surface-alt: #1e293b; /* slate-900 */
+
+  /* 텍스트 색상 계열 */
+  --text-primary: #f4f4f5; /* zinc-100 */
+  --text-secondary: #e4e4e7; /* zinc-200 */
+  --text-tertiary: #a1a1aa; /* zinc-400 */
+  --text-muted: #71717a; /* zinc-500 */
+  --text-disabled: #52525b; /* zinc-600 */
+  --text-inverse: #27272a; /* zinc-800 */
+  --text-white: #ffffff;
+  --text-slate-light: #f1f5f9; /* slate-100 */
+  --text-slate-mid: #cbd5e1; /* slate-300 */
+
+  /* 경계선/링 색상 */
+  --border-primary: #3f3f46; /* zinc-700 */
+  --border-secondary: #52525b; /* zinc-600 */
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-light: rgba(255, 255, 255, 0.1);
+  --border-medium: rgba(255, 255, 255, 0.25);
+  --ring-primary: #3f3f46; /* zinc-700 */
+  --ring-secondary: #52525b; /* zinc-600 */
+
+  /* 액션 색상 */
+  --action-primary: #3b82f6; /* blue-500 */
+  --action-primary-hover: #60a5fa; /* blue-400 */
+  --action-success: #10b981; /* emerald-500 */
+  --action-success-hover: #34d399; /* emerald-400 */
+  --action-accent: #6366f1; /* indigo-500 */
+  --action-accent-hover: #818cf8; /* indigo-400 */
+
+  /* 효과 색상 (그라데이션/특수 효과용) */
+  --effect-indigo: #6366f1;
+  --effect-violet: #8b5cf6;
+  --effect-pink: #ec4899;
+  --effect-emerald: #10b981;
+  --effect-blue: #3b82f6;
+  --effect-cyan: #06b6d4;
+
+  /* 스크롤바 색상 */
+  --scrollbar-thumb: #d4d4d8; /* zinc-300 */
+  --scrollbar-border: rgba(212, 212, 216, 0.8); /* zinc-300/80 */
+
+  /* Manifest 색상 */
+  --manifest-bg: #ffffff;
+  --manifest-theme: #000000;
+}
+
+/**
+ * Soft Palette - Flat 디자인 테마
+ * 
+ * 부드럽고 따뜻한 색상 조합으로 눈의 피로를 줄이고
+ * 미니멀한 플랫 디자인 경험을 제공합니다.
+ */
+[data-palette="soft"] {
+  /* 배경 색상 계열 - 부드러운 slate/stone 톤 */
+  --bg-base: #1c1917; /* stone-900 */
+  --bg-primary: #292524; /* stone-800 */
+  --bg-secondary: #44403c; /* stone-700 */
+  --bg-tertiary: #57534e; /* stone-600 */
+  --bg-input: #44403c; /* stone-700 */
+  --bg-hover: #57534e; /* stone-600 */
+  --bg-card: #292524; /* stone-800 */
+  --bg-bottom-card: #1c1917; /* stone-900 */
+  --bg-surface: #1c1917; /* stone-900 */
+  --bg-surface-alt: #292524; /* stone-800 */
+
+  /* 텍스트 색상 계열 - 부드러운 톤 */
+  --text-primary: #fafaf9; /* stone-50 */
+  --text-secondary: #e7e5e4; /* stone-200 */
+  --text-tertiary: #a8a29e; /* stone-400 */
+  --text-muted: #78716c; /* stone-500 */
+  --text-disabled: #57534e; /* stone-600 */
+  --text-inverse: #292524; /* stone-800 */
+  --text-white: #fafaf9; /* stone-50 */
+  --text-slate-light: #f5f5f4; /* stone-100 */
+  --text-slate-mid: #d6d3d1; /* stone-300 */
+
+  /* 경계선/링 색상 - 부드러운 경계 */
+  --border-primary: #57534e; /* stone-600 */
+  --border-secondary: #78716c; /* stone-500 */
+  --border-subtle: rgba(255, 255, 255, 0.03);
+  --border-light: rgba(255, 255, 255, 0.06);
+  --border-medium: rgba(255, 255, 255, 0.15);
+  --ring-primary: #57534e; /* stone-600 */
+  --ring-secondary: #78716c; /* stone-500 */
+
+  /* 액션 색상 - 파스텔/뮤트 톤 */
+  --action-primary: #f97316; /* orange-500 - warm accent */
+  --action-primary-hover: #fb923c; /* orange-400 */
+  --action-success: #84cc16; /* lime-500 */
+  --action-success-hover: #a3e635; /* lime-400 */
+  --action-accent: #f59e0b; /* amber-500 */
+  --action-accent-hover: #fbbf24; /* amber-400 */
+
+  /* 효과 색상 - 따뜻하고 부드러운 그라데이션 */
+  --effect-indigo: #f97316; /* orange */
+  --effect-violet: #f59e0b; /* amber */
+  --effect-pink: #fb7185; /* rose-400 */
+  --effect-emerald: #84cc16; /* lime */
+  --effect-blue: #fbbf24; /* amber-400 */
+  --effect-cyan: #a3e635; /* lime-400 */
+
+  /* 스크롤바 색상 */
+  --scrollbar-thumb: #a8a29e; /* stone-400 */
+  --scrollbar-border: rgba(168, 162, 158, 0.6); /* stone-400/60 */
+}
+
+/**
+ * Soft Palette (Light) - Modern Day
+ * 
+ * 자연광을 닮은 따뜻한 오프화이트(Off-white) 베이스와
+ * 깊이감 있는 웜 그레이 텍스트로 눈부심을 방지하고
+ * 깔끔하고 모던한 인상을 줍니다.
+ */
+ [data-palette="soft-light"] {
+  /* 배경 색상 계열 - 따뜻하고 화사한 크림/stone 톤 */
+  --bg-base: #fafaf9; /* stone-50 : 전체 배경 */
+  --bg-primary: #ffffff; /* pure white : 메인 컨텐츠/카드 */
+  --bg-secondary: #f5f5f4; /* stone-100 : 사이드바/헤더 */
+  --bg-tertiary: #e7e5e4; /* stone-200 : 호버/활성 상태 */
+  --bg-input: #ffffff; /* 입력창은 명확성을 위해 화이트 */
+  --bg-hover: #f5f5f4; /* stone-100 */
+  --bg-card: #ffffff; /* 카드 배경 */
+  --bg-bottom-card: #fafaf9; /* stone-50 */
+  --bg-surface: #ffffff; 
+  --bg-surface-alt: #f5f5f4;
+
+  /* 텍스트 색상 계열 - 가독성 높은 짙은 웜 그레이 */
+  --text-primary: #1c1917; /* stone-900 : 본문 중요 텍스트 */
+  --text-secondary: #44403c; /* stone-700 : 부제목/보조 텍스트 */
+  --text-tertiary: #78716c; /* stone-500 : 아이콘/부가정보 */
+  --text-muted: #a8a29e; /* stone-400 : 비활성 텍스트 */
+  --text-disabled: #d6d3d1; /* stone-300 */
+  --text-inverse: #fafaf9; /* stone-50 : 반전 텍스트 (버튼 등) */
+  --text-white: #ffffff;
+  --text-slate-light: #57534e; /* stone-600 */
+  --text-slate-mid: #78716c; /* stone-500 */
+
+  /* 경계선/링 색상 - 섬세하고 얇은 구분선 */
+  --border-primary: #e7e5e4; /* stone-200 : 기본 테두리 */
+  --border-secondary: #f5f5f4; /* stone-100 : 옅은 테두리 */
+  --border-subtle: rgba(0, 0, 0, 0.04);
+  --border-light: rgba(0, 0, 0, 0.08);
+  --border-medium: rgba(0, 0, 0, 0.12);
+  --ring-primary: #d6d3d1; /* stone-300 */
+  --ring-secondary: #e7e5e4; /* stone-200 */
+
+  /* 액션 색상 - 다크 모드의 아이덴티티를 유지하되 명도 조정 */
+  --action-primary: #f97316; /* orange-500 : 따뜻한 활력 */
+  --action-primary-hover: #ea580c; /* orange-600 : 호버 시 깊이감 */
+  --action-success: #65a30d; /* lime-600 : 가독성을 위해 조금 더 짙게 */
+  --action-success-hover: #4d7c0f; /* lime-700 */
+  --action-accent: #f59e0b; /* amber-500 */
+  --action-accent-hover: #d97706; /* amber-600 */
+
+  /* 효과 색상 - 밝은 배경에 어울리는 파스텔 톤 */
+  --effect-indigo: #fb923c; /* orange-400 */
+  --effect-violet: #fbbf24; /* amber-400 */
+  --effect-pink: #f43f5e; /* rose-500 */
+  --effect-emerald: #84cc16; /* lime-500 */
+  --effect-blue: #f59e0b; /* amber-500 */
+  --effect-cyan: #a3e635; /* lime-400 */
+
+  /* 스크롤바 색상 */
+  --scrollbar-thumb: #d6d3d1; /* stone-300 */
+  --scrollbar-border: rgba(231, 229, 228, 0.8); /* stone-200 */
 }
 
 @theme inline {
@@ -27,7 +225,8 @@ body,
   width: 100% !important;
   height: 100% !important;
   overflow: hidden !important;
-  background-color: black !important;
+  background-color: var(--bg-base) !important;
+  font-family: var(--font-pretendard), sans-serif !important;
 }
 
 #arjs-video {
@@ -62,11 +261,68 @@ body,
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background-color: transparent;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply border-2 border-zinc-300/80 bg-zinc-300;
+  border: 2px solid var(--scrollbar-border);
+  background-color: var(--scrollbar-thumb);
   border-radius: 10px;
+}
+
+/* 모바일 터치 최적화 */
+.touch-target {
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Safe Area 지원 */
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 8px);
+}
+
+/* 모바일 스크롤바 숨김 */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* 터치 피드백 */
+.touch-feedback {
+  /* transition: background-color 0.15s ease, transform 0.15s ease; */
+}
+.touch-feedback:active {
+  /* background-color: var(--bg-secondary); */
+  /* transform: scale(0.98); */
+}
+
+/* 스와이프 힌트 애니메이션 */
+@keyframes swipe-hint {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.swipe-hint {
+  animation: swipe-hint 2s ease-in-out infinite;
+}
+
+/* 현재 단계 펄스 효과 */
+@keyframes step-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--action-primary); opacity: 1; }
+  50% { box-shadow: 0 0 0 6px transparent; opacity: 0.8; }
+}
+.step-current-pulse {
+  animation: step-pulse 2s ease-in-out infinite;
+}
+
+/* 그랩 커서 (드래그 가능 힌트) */
+.grabbable {
+  cursor: grab;
+}
+.grabbable:active {
+  cursor: grabbing;
 }

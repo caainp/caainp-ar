@@ -47,7 +47,7 @@ export default function NavigationCardInstructionText({
     <div className="overflow-hidden relative">
       <p
         ref={textRef}
-        className="instruction-text text-base font-medium text-zinc-100 leading-snug origin-center"
+        className="instruction-text text-lg font-semibold text-(--text-primary) leading-snug origin-center"
       >
         {displayedText}
       </p>

@@ -8,6 +8,7 @@ import {
   useState,
   useCallback,
   useEffect,
+  Activity,
 } from "react";
 import Webcam from "react-webcam";
 import CameraOffBackground from "./CameraOffBackground";
@@ -42,7 +43,7 @@ export default function Camera({ children }: { children?: ReactNode }) {
   useEffect(() => {
     const checkCameraPermission = async () => {
       try {
-        if (navigator.permissions) {
+        if (navigator.permissions && isWebcamEnabled) {
           const permissionStatus = await navigator.permissions.query({
             name: "camera" as PermissionName,
           });
@@ -55,12 +56,15 @@ export default function Camera({ children }: { children?: ReactNode }) {
       } catch (error) {
         // permissions API를 지원하지 않는 브라우저의 경우
         // onUserMediaError에서 처리
+        alert(
+          "카메라 권한이 필요합니다. 브라우저 설정에서 카메라 권한을 허용해주세요."
+        );
         console.warn("카메라 권한 확인 실패:", error);
       }
     };
 
     checkCameraPermission();
-  }, []);
+  }, [isWebcamEnabled]);
 
   const handleUserMedia = useCallback(() => {
     setHasCameraPermission(true);
@@ -69,6 +73,10 @@ export default function Camera({ children }: { children?: ReactNode }) {
   const handleUserMediaError = useCallback((error: string | DOMException) => {
     console.error("카메라 접근 오류:", error);
     setHasCameraPermission(false);
+    alert(
+      "카메라 권한이 필요합니다. 브라우저 설정에서 카메라 권한을 허용해주세요."
+    );
+    setIsWebcamEnabled(false);
   }, []);
 
   const toggleWebcam = useCallback(() => {
@@ -96,7 +104,7 @@ export default function Camera({ children }: { children?: ReactNode }) {
         disableWebcam,
       }}
     >
-      {shouldShowCamera ? (
+      {shouldShowCamera && (
         <Webcam
           ref={webcamRef}
           audio={false}
@@ -117,9 +125,11 @@ export default function Camera({ children }: { children?: ReactNode }) {
           onUserMedia={handleUserMedia}
           onUserMediaError={handleUserMediaError}
         />
-      ) : (
-        <CameraOffBackground />
       )}
+
+      <Activity mode={shouldShowCamera ? "hidden" : "visible"}>
+        <CameraOffBackground />
+      </Activity>
       {children}
     </CameraContext.Provider>
   );

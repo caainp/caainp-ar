@@ -13,7 +13,7 @@ export default function DestinationInput({
 }) {
   return (
     <div className="relative flex-1">
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-muted)">
         <Search size={18} />
       </div>
       <input
@@ -24,8 +24,8 @@ export default function DestinationInput({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         placeholder="목적지 검색"
-        className="w-full bg-zinc-800 rounded-3xl py-3 pl-10 pr-4 text-zinc-100 text-sm placeholder-zinc-500 
-          focus:outline-none focus:ring-1 focus:ring-zinc-600 transition-all"
+        className="w-full bg-(--bg-input) rounded-3xl py-3 pl-10 pr-4 text-(--text-primary) text-sm placeholder-(--text-muted) 
+          focus:outline-none focus:ring-1 focus:ring-(--ring-secondary) ring-1 ring-(--ring-primary) shadow-2xl shadow-(--bg-card) transition-all"
       />
     </div>
   );

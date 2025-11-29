@@ -20,6 +20,9 @@ export interface OverlayContextValue {
   setSetting: Dispatch<SetStateAction<boolean>>;
   debug: boolean;
   setDebug: Dispatch<SetStateAction<boolean>>;
+  handleDebugUpdateNav: () => Promise<void>;
+  palette: string;
+  setPalette: Dispatch<SetStateAction<string>>;
 }
 
 const OverlayContext = createContext<OverlayContextValue | undefined>(

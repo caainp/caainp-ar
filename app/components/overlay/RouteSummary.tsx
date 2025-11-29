@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback, memo } from "react";
+import React, { useEffect, useRef, useState, useCallback, memo, TouchEvent } from "react";
 import { animate, createScope, stagger, TweenParamValue } from "animejs";
 import RouteStep from "./RouteStep";
 import RouteSummaryHeader from "./RouteSummaryHeader";
 import { useOverlayContext } from "./OverlayContext";
+
+const SWIPE_THRESHOLD = 30;
 
 // 애니메이션 상수
 const ANIMATION_CONFIG = {
@@ -28,7 +30,7 @@ const ANIMATION_CONFIG = {
       ease: "outExpo",
     },
     stepItems: {
-      duration: 300,
+      duration: 200,
       staggerDelay: 30,
       ease: "outExpo",
       translateY: [0, 0] as [number, number],
@@ -49,11 +51,10 @@ const ANIMATION_CONFIG = {
       translateY: [20, 0] as [number, number],
     },
     stepItems: {
-      duration: 400,
-      staggerDelay: 100,
-      staggerStart: 200,
+      duration: 300,
+      staggerDelay: 50,
+      staggerStart: 0,
       ease: "outExpo",
-      // translateX: [-20, 0] as [number, number],
     },
     progressBar: {
       duration: 800,
@@ -155,22 +156,12 @@ function RouteSummary() {
       height: [0, height],
       marginTop: ["0px", config.container.marginTop],
       paddingTop: ["0px", config.container.paddingTop],
-      opacity: [0, 1],
       duration: config.container.duration,
       ease: config.container.ease,
       complete: () => {
         resetContainerStyles(container);
         setIsAnimating(false);
       },
-    });
-
-    // 단계 아이템 애니메이션
-    animateStepItems(".step-item", {
-      opacity: [0, 1],
-      scale: config.stepItems.scale,
-      duration: config.stepItems.duration,
-      delay: stagger(config.stepItems.staggerDelay, { start: 0 }),
-      ease: config.stepItems.ease,
     });
   }, [isAnimating]);
 
@@ -190,16 +181,6 @@ function RouteSummary() {
     const stepItems = container.querySelectorAll(".step-item");
     const totalSteps = stepItems.length;
 
-    // 단계 아이템 페이드 아웃
-    animateStepItems(".step-item", {
-      opacity: [1, 0],
-      translateY: config.stepItems.translateY,
-      scale: config.stepItems.scale,
-      duration: config.stepItems.duration,
-      delay: stagger(config.stepItems.staggerDelay, { from: "last" }),
-      ease: config.stepItems.ease,
-    });
-
     // 접기 애니메이션
     const foldDelay = Math.min(
       totalSteps * config.delayMultiplier,
@@ -210,7 +191,6 @@ function RouteSummary() {
       height: [`${height}px`, 0],
       marginTop: [ANIMATION_CONFIG.SPREAD.container.marginTop, "0px"],
       paddingTop: [ANIMATION_CONFIG.SPREAD.container.paddingTop, "0px"],
-      opacity: [1, 0],
       duration: config.container.duration,
       ease: config.container.ease,
       complete: () => {
@@ -380,6 +360,34 @@ function RouteSummary() {
     handleSpread(!isSpread, true);
   }, [isSpread, handleSpread]);
 
+  // 스와이프 제스처 처리
+  const touchStartY = useRef<number | null>(null);
+  
+  const handleTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: TouchEvent<HTMLDivElement>) => {
+    if (touchStartY.current === null) return;
+    
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaY = touchStartY.current - touchEndY;
+    
+    if (Math.abs(deltaY) > SWIPE_THRESHOLD) {
+      // 위로 스와이프 = 펼치기, 아래로 스와이프 = 접기
+      const shouldSpread = deltaY > 0;
+      if (shouldSpread !== isSpread) {
+        handleSpread(shouldSpread, true);
+        // 햅틱 피드백 (지원하는 기기에서)
+        if (navigator.vibrate) {
+          navigator.vibrate(10);
+        }
+      }
+    }
+    
+    touchStartY.current = null;
+  }, [isSpread, handleSpread]);
+
   if (isLoading) {
     return <div ref={rootRef} className="route-container w-full"></div>;
   }
@@ -387,9 +395,23 @@ function RouteSummary() {
   return (
     <div
       ref={rootRef}
-      className="route-container w-full px-4 py-3 cursor-pointer select-none border-t border-zinc-800"
+      className="route-container w-full px-5 pt-4 pb-3 select-none safe-bottom
+        bg-(--bg-bottom-card) rounded-t-3xl ring-1 ring-(--bg-secondary)/70
+        touch-feedback grabbable shadow-lg shadow-black/20
+      "
       onClick={handleToggleSpread}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
+      {/* 드래그 핸들 힌트 */}
+      <div className="flex justify-center mb-3">
+        <div 
+          className={`w-10 h-1 rounded-full bg-(--text-disabled) transition-all duration-300 ${
+            !isSpread ? 'swipe-hint' : 'opacity-50'
+          }`}
+        />
+      </div>
+
       {/* 헤더 */}
       <RouteSummaryHeader
         collapsedInfoRef={collapsedInfoRef}
@@ -399,10 +421,11 @@ function RouteSummary() {
         totalSteps={routeSummary.total_steps}
       />
 
-      {/* 경로 단계들 */}
+      {/* 경로 단계들 - Stepper UI */}
       <div
         ref={stepsContainerRef}
-        className="steps-container space-y-1 pt-4 flex flex-col overflow-y-auto max-h-36 h-0"
+        className="steps-container pt-4 px-2 flex flex-col overflow-y-auto 
+          max-h-52 h-0 scrollbar-hide overscroll-contain"
       >
         {steps.map((step, index) => {
           const isCompleted = index < routeSummary.current_step - 1;
