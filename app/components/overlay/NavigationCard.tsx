@@ -34,7 +34,12 @@ export default function NavigationCard() {
       {/* 네비게이션 헤더 */}
       <div className="flex flex-col p-2 gap-2">
         {/* 이전 돌아가기, 설정 버튼 */}
-        <NavigationCardHeader handleCancelDestination={handleCancelDestination} setSetting={setSetting} navData={navData} />
+        <NavigationCardHeader 
+          handleCancelDestination={handleCancelDestination} 
+          setSetting={setSetting} 
+          navData={navData} 
+          isLoading={isLoadingDestination}
+        />
 
         {/* 메인 네비게이션 카드 */}
         {isLoadingDestination ? (

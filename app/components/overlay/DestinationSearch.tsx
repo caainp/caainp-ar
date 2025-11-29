@@ -113,8 +113,8 @@ export default function DestinationSearch() {
   return (
     <div
       ref={rootRef}
-      className="w-full max-w-sm mx-auto pointer-events-auto bg-(--bg-card) rounded-3xl overflow-hidden shadow-2xl/30
-      ring-1 ring-(--bg-secondary)/70"
+      className="w-full max-w-sm mx-auto pointer-events-auto bg-(--bg-card)/80 backdrop-blur-xl rounded-[2rem] overflow-hidden shadow-2xl 
+      ring-1 ring-white/10 border border-white/10"
     >
       {/* 검색 입력 필드 */}
       <div className="p-2 relative z-10 bg-(--bg-card) flex items-center gap-2">

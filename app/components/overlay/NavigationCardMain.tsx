@@ -38,9 +38,9 @@ export default function NavigationCardMain({
   handleCancelDestination: () => void;
 }) {
   return (
-    <div className="flex gap-6 p-4">
+    <div className="flex gap-5 p-5 items-center">
       <div
-        className={`shrink-0 size-16 rounded-2xl flex items-center justify-center ${
+        className={`shrink-0 size-14 rounded-2xl flex items-center justify-center shadow-md ${
           getDirectionStyles().container
         }`}
       >
@@ -48,8 +48,10 @@ export default function NavigationCardMain({
           {renderDirectionIcon(navData.move_instruction.direction_type)}
         </span>
       </div>
-      <div className="flex flex-col justify-center min-w-0 gap-2">
-        <p className="text-xs text-(--text-tertiary)">다음 안내</p>
+      <div className="flex flex-col justify-center min-w-0 gap-0.5">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-(--text-tertiary) opacity-80">
+          다음 안내
+        </p>
         <NavigationCardInstructionText
           text_ko={navData.move_instruction.text_ko}
         />
