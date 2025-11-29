@@ -1,6 +1,46 @@
-## 시작하기
+# caainp-ar
 
-개발 서버 실행:
+**caainp-ar**는 Next.js를 기반으로 구축된 웹 내비게이션 애플리케이션입니다.
+
+https://cannip.kamilereon.net/
+
+## ✨ 주요 기능
+
+- **실시간 카메라 오버레이**: `react-webcam`을 활용하여 실제 환경 위에 내비게이션 지시 사항과 정보를 시각적으로 표시합니다.
+- **목적지 검색**: 사용자 친화적인 검색 인터페이스를 통해 원하는 장소를 빠르고 간편하게 찾을 수 있습니다.
+- **이 대화형 내비게이션**: 단계별 안내(Turn-by-turn)와 명확한 시각적 큐를 제공하여 길 찾기 경험을 향상시킵니다.
+- **모바일 퍼스트**: 카메라가 장착된 모바일 기기에서의 사용성을 최우선으로 고려하여 설계되었습니다.
+
+## 🛠️ 기술 스택
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router), [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Camera**: [react-webcam](https://www.npmjs.com/package/react-webcam)
+- **Animations**: [Anime.js](https://animejs.com/)
+- **Icons**: [Lucide React](https://lucide.dev/), [React Icons](https://react-icons.github.io/react-icons/)
+
+## 🚀 시작하기
+
+이 프로젝트를 로컬 환경에서 실행하려면 다음 단계를 따르세요.
+
+### 전제 조건
+
+- Node.js (최신 LTS 버전 권장)
+- 카메라가 장착된 디바이스 (모바일 또는 웹캠이 있는 노트북)
+
+### 설치
+
+프로젝트 디렉토리로 이동하여 의존성을 설치합니다.
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+### 개발 서버 실행
 
 ```bash
 npm run dev
@@ -8,8 +48,22 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000) 접속하여 결과를 확인합니다.
+브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 결과를 확인하세요.
+
+> **카메라 권한 주의사항**: 모바일 기기에서 카메라에 접근하려면 **HTTPS** 환경이 필요합니다. 로컬 테스트 시에는 `ngrok`과 같은 터널링 도구를 사용하거나, 브라우저의 보안 설정을 조정해야 할 수 있습니다.
+
+## 📂 프로젝트 구조
+
+주요 디렉토리 및 파일 구조는 다음과 같습니다.
+
+- **`app/`**: Next.js App Router 기반의 페이지 및 레이아웃
+- **`app/components/overlay/`**: 내비게이션 UI 컴포넌트 모음
+    - `DestinationSearch.tsx`: 목적지 검색 기능
+    - `NavigationCard.tsx`: 경로 안내 카드
+    - `setting/`: 설정 관련 컴포넌트
+- **`app/components/Camera*`**: 카메라 및 배경 처리 관련 컴포넌트
+    - `Camera.tsx`: 웹캠 피드 처리 및 래퍼
+    - `CameraOffBackground.tsx`: 카메라 꺼짐 상태 배경
+---
