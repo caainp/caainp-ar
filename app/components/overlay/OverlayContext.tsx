@@ -15,7 +15,7 @@ export interface OverlayContextValue {
   handleRemoveRecentDestination: (destination: string) => void;
   handleRemoveAllRecentDestinations: () => void;
   handleStepChange: (newStep: number) => void;
-  handleDebugCapture: (captureImage: string) => Promise<void>;
+  handleDebugCapture: (captureImage: string | Blob) => Promise<void>;
   setting: boolean;
   setSetting: Dispatch<SetStateAction<boolean>>;
   debug: boolean;

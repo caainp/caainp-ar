@@ -42,8 +42,8 @@ export async function calculateDestination(
     );
   }
 
-  // 2초 대기 (서버 응답 시뮬레이션)
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  // 2초 대기 (서버 응답 시뮬레이션) - 제거됨
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
 
   // 예시 응답 데이터
   const navData: NavData = {

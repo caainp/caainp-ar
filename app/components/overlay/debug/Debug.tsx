@@ -6,7 +6,7 @@ import {
   Video,
   VideoOff,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useCameraCapture } from "@/app/hooks/useCameraCapture";
 import { useOverlayContext } from "../OverlayContext";
 import { useCameraContext } from "@/app/components/Camera";
@@ -23,6 +23,9 @@ export default function Debug() {
   const { captureScreen, isCapturing } = useCameraCapture();
   const { isWebcamEnabled, toggleWebcam } = useCameraContext();
   const [isUpdatingNav, setIsUpdatingNav] = useState(false);
+
+  const [isAutoCapturing, setIsAutoCapturing] = useState(false);
+  const autoCaptureIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const handlePrevious = () => {
     if (currentStep > 1) {
@@ -47,7 +50,14 @@ export default function Debug() {
 
     setIsUpdatingNav(true);
     try {
-      const capturedImage = await captureScreen({ download: false });
+      // Blob으로 캡처하고 리사이징
+      const capturedImage = await captureScreen({ 
+        download: false, 
+        format: "blob",
+        width: 640,
+        quality: 0.7
+      });
+      
       if (capturedImage) {
         await handleDebugCapture(capturedImage);
       }
@@ -56,6 +66,62 @@ export default function Debug() {
     } finally {
       setIsUpdatingNav(false);
     }
+  };
+
+  // 자동 캡처 루프
+  useEffect(() => {
+    if (isAutoCapturing) {
+      const runAutoCapture = async () => {
+        if (isUpdatingNav || isCapturing) return;
+
+        try {
+          let imageToSend: string | Blob | null = null;
+          
+          try {
+            imageToSend = await captureScreen({ 
+              download: false, 
+              format: "blob",
+              width: 640,
+              quality: 0.6 
+            });
+          } catch (e) {
+            console.warn("Capture failed, using dummy:", e);
+          }
+          
+          // 캡처 실패 시 더미 데이터 사용
+          if (!imageToSend) {
+            // 1x1 픽셀 검은색 JPEG 더미 데이터
+            const dummyBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
+            const response = await fetch(`data:image/png;base64,${dummyBase64}`);
+            imageToSend = await response.blob();
+          }
+          
+          if (imageToSend) {
+            await handleDebugCapture(imageToSend);
+          }
+        } catch (error) {
+          console.error("자동 캡처 실패:", error);
+        }
+      };
+
+      // 100ms
+      autoCaptureIntervalRef.current = setInterval(runAutoCapture, 100);
+    } else {
+      if (autoCaptureIntervalRef.current) {
+        clearInterval(autoCaptureIntervalRef.current);
+        autoCaptureIntervalRef.current = null;
+      }
+    }
+
+    return () => {
+      if (autoCaptureIntervalRef.current) {
+        clearInterval(autoCaptureIntervalRef.current);
+      }
+    };
+  }, [isAutoCapturing, captureScreen, handleDebugCapture, isUpdatingNav, isCapturing]);
+
+  const toggleAutoCapture = () => {
+    setIsAutoCapturing((prev) => !prev);
   };
 
   const handleDebugUpdateStep = async () => {
@@ -77,7 +143,7 @@ export default function Debug() {
     <div className="flex flex-col bg-(--bg-primary)/90 backdrop-blur-md border border-(--border-primary) rounded-2xl p-4 gap-4 max-w-sm w-full mx-auto shadow-xl transition-all duration-300">
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-bold text-(--text-tertiary) tracking-wider uppercase">디버그 컨트롤</h2>
-        {/* <div className="h-1.5 w-1.5 rounded-full bg-(--action-success) animate-pulse" /> */}
+        {isAutoCapturing && <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />}
       </div>
       
       <div className="flex flex-col gap-3">
@@ -147,6 +213,20 @@ export default function Debug() {
             <span className="text-xs font-medium">무작위 값 갱신</span>
           </button>
         </div>
+
+        {/* Auto Capture Control */}
+        <button
+          onClick={toggleAutoCapture}
+          className={`w-full h-10 px-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 border ${
+            isAutoCapturing
+              ? "bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20"
+              : "bg-(--bg-secondary) border-(--border-subtle) text-(--text-primary) hover:bg-(--bg-tertiary)"
+          }`}
+        >
+          <span className="text-xs font-medium">
+            {isAutoCapturing ? "자동 캡처 중지 (10Hz)" : "자동 캡처 시작 (10Hz)"}
+          </span>
+        </button>
       </div>
     </div>
   );

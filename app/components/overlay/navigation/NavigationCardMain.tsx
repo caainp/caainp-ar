@@ -1,8 +1,8 @@
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { TbStairsUp } from "react-icons/tb";
 import { TbStairsDown } from "react-icons/tb";
-import { DirectionType, NavData } from "./types";
-import { MapPin, X } from "./Icons";
+import { DirectionType, NavData } from "../types";
+import { MapPin, X } from "../Icons";
 import NavigationCardInstructionText from "./NavigationCardInstructionText";
 
 const renderDirectionIcon = (directionType: DirectionType) => {

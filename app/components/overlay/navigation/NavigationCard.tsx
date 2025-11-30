@@ -1,6 +1,6 @@
-import { useOverlayContext } from "./OverlayContext";
-import NavigationCardLoading from "../loading/NavigationCardLoading";
-import NavigationCardMain from "./NavigationCardMain";
+import { useOverlayContext } from "../OverlayContext";
+import NavigationCardLoading from "../../loading/NavigationCardLoading";
+import NavigationCardMain from "@/app/components/overlay/navigation/NavigationCardMain";
 import { useEffect, useRef } from "react";
 import { createScope } from "animejs";
 import { animate } from "animejs";

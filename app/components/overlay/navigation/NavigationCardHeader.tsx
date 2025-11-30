@@ -1,5 +1,6 @@
 import { ArrowLeft, Settings } from "lucide-react";
-import { NavData } from "./types";
+import { NavData } from "../types";
+import NavigationCardHeaderLoading from "../../loading/NavigationCardHeaderLoading";
 
 export default function NavigationCardHeader({
   handleCancelDestination,
@@ -24,10 +25,7 @@ export default function NavigationCardHeader({
 
       <div className="flex flex-col items-center gap-0.5">
         {isLoading ? (
-          <>
-            <div className="h-3 w-10 rounded-full bg-(--bg-tertiary) animate-pulse mb-1" />
-            <div className="h-5 w-32 rounded-md bg-(--bg-tertiary) animate-pulse" />
-          </>
+          <NavigationCardHeaderLoading />
         ) : (
           navData.destination && (
             <>

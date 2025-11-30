@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import NavigationCard from "./NavigationCard";
-import DestinationSearch from "./DestinationSearch";
+import NavigationCard from "./navigation/NavigationCard";
+import DestinationSearch from "../destination/DestinationSearch";
 import Debug from "./debug/Debug";
 import { NavData } from "./types";
 import { calculateDestination } from "@/app/lib/action";
-import { OverlayProvider } from "./OverlayContext";
+import { OverlayProvider, useOverlayContext } from "./OverlayContext";
 import SettingWrapper from "./setting/SettingWrapper";
-import RouteSummary from "./RouteSummary";
+import RouteSummary from "./route/RouteSummary";
 
 const dataUrlToFile = (dataUrl: string, filename: string) => {
   const [header, data] = dataUrl.split(",");
@@ -44,7 +44,7 @@ const initialNavData: NavData = {
 };
 
 export default function Overlay() {
-  const [debug, setDebug] = useState(true);
+  const [debug, setDebug] = useState(false);
   const [setting, setSetting] = useState(false);
   const [navData, setNavData] = useState<NavData>(initialNavData);
   const [recentDestinations, setRecentDestinations] = useState<string[]>([]);
@@ -100,7 +100,7 @@ export default function Overlay() {
   };
 
   const handleDebugCapture = useCallback(
-    async (captureImage: string) => {
+    async (captureImage: string | Blob) => {
       if (!captureImage) {
         return;
       }
@@ -111,10 +111,18 @@ export default function Overlay() {
       try {
         const formData = new FormData();
         formData.append("destination", destinationLabel);
-        const captureFile = dataUrlToFile(
-          captureImage,
-          `ar-capture-${Date.now()}.png`
-        );
+
+        let captureFile: File;
+        const filename = `ar-capture-${Date.now()}.jpg`;
+
+        if (captureImage instanceof Blob) {
+          captureFile = new File([captureImage], filename, {
+            type: "image/jpeg",
+          });
+        } else {
+          captureFile = dataUrlToFile(captureImage, filename);
+        }
+
         formData.append("captureImage", captureFile);
 
         const newNavData = await calculateDestination(formData);
@@ -128,21 +136,18 @@ export default function Overlay() {
     [navData.destination]
   );
 
-  const handleDebugUpdateNav = useCallback(
-    async () => {
-      const destinationLabel = navData.destination ?? "DESTINATION";
+  const handleDebugUpdateNav = useCallback(async () => {
+    const destinationLabel = navData.destination ?? "DESTINATION";
 
-      try {
-        const formData = new FormData();
-        formData.append("destination", destinationLabel);
-        const newNavData = await calculateDestination(formData);
-        setNavData(newNavData);
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    [navData.destination]
-  );
+    try {
+      const formData = new FormData();
+      formData.append("destination", destinationLabel);
+      const newNavData = await calculateDestination(formData);
+      setNavData(newNavData);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [navData.destination]);
 
   useEffect(() => {
     if (palette === "default") {
@@ -176,35 +181,39 @@ export default function Overlay() {
         setPalette,
       }}
     >
-      <>
-        <div className="absolute top-0 left-0 right-0 h-fit text-(--text-white)">
-          {!(navData.destination || isLoadingDestination) && (
-            <div className="p-4">
-              <DestinationSearch />
-            </div>
-          )}
-          {(isLoadingDestination || navData.destination) && <NavigationCard />}
-        </div>
-
-        {setting && <SettingWrapper />}
-
-        <div className="absolute bottom-0 left-0 right-0 h-fit flex flex-col justify-between font-sans antialiased text-(--text-white)">
-          {/* Debug */}
-          {navData.destination && (
-            <div className="relative mx-auto max-w-sm w-full pointer-events-auto mb-2 p-4 gap-2 flex flex-col">
-              {/* <button
-                onClick={() => setDebug(!debug)}
-                className="bg-(--bg-secondary) hover:bg-(--bg-hover) text-(--text-primary) px-4 py-2 rounded-lg transition-colors cursor-pointer shadow-2xl shadow-(--bg-card)"
-              >
-                {debug ? "Debug Off" : "Debug On"}
-              </button> */}
-              {navData.destination && debug && <Debug />}
-            </div>
-          )}
-
-          {navData.destination && <RouteSummary />}
-        </div>
-      </>
+      <OverlayTopSheet />
+      {setting && <SettingWrapper />}
+      <OverlayBottomSheet />
     </OverlayProvider>
+  );
+}
+
+function OverlayTopSheet() {
+  const { navData, isLoadingDestination } = useOverlayContext();
+
+  return (
+    <div className="absolute top-0 left-0 right-0 h-fit text-(--text-white)">
+      {!(navData.destination || isLoadingDestination) && (
+        <div className="p-4">
+          <DestinationSearch />
+        </div>
+      )}
+      {(navData.destination || isLoadingDestination) && <NavigationCard />}
+    </div>
+  );
+}
+
+function OverlayBottomSheet() {
+  const { navData, debug } = useOverlayContext();
+  return (
+    <div className="absolute bottom-0 left-0 right-0 h-fit flex flex-col justify-between font-sans antialiased text-(--text-white)">
+      {/* Debug */}
+      {navData.destination && debug && (
+        <div className="relative mx-auto max-w-sm w-full pointer-events-auto mb-2 p-4 gap-2 flex flex-col">
+          <Debug />
+        </div>
+      )}
+      {navData.destination && <RouteSummary />}
+    </div>
   );
 }

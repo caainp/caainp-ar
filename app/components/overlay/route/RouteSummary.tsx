@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, useCallback, memo, TouchEvent } fro
 import { animate, createScope, stagger, TweenParamValue } from "animejs";
 import RouteStep from "./RouteStep";
 import RouteSummaryHeader from "./RouteSummaryHeader";
-import { useOverlayContext } from "./OverlayContext";
+import { useOverlayContext } from "../OverlayContext";
 
 const SWIPE_THRESHOLD = 30;
 

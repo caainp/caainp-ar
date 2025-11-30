@@ -1,4 +1,4 @@
-import { CheckCircle, Circle, Flag } from "./Icons";
+import { CheckCircle, Circle, Flag } from "../Icons";
 
 interface RouteStepProps {
   step: string;
@@ -21,7 +21,7 @@ export default function RouteStep({
       data-step-index={index}
       className="step-item flex gap-3 transition-all duration-200"
     >
-      {/* 왼쪽: 인디케이터 + 연결선 */}
+      {/* 왼쪽 인디케이터 + 연결선 */}
       <div className="flex flex-col items-center">
         {/* 스텝 인디케이터 */}
         <div
@@ -48,7 +48,7 @@ export default function RouteStep({
           )}
         </div>
 
-        {/* 연결선 (마지막 아이템 제외) */}
+        {/* 연결선 마지막 아이템 제외 */}
         {!isLast && (
           <div
             className={`w-0.5 flex-1 min-h-4 rounded-full transition-colors duration-300
@@ -57,12 +57,12 @@ export default function RouteStep({
         )}
       </div>
 
-      {/* 오른쪽: 콘텐츠 */}
+      {/* 오른쪽 콘텐츠 */}
       <div
         className={`flex-1 pb-4 transition-all duration-200
           ${isLast ? "pb-0" : ""}`}
       >
-        {/* 현재 단계 배지 */}
+        {/* 현재 단계 표시 */}
         {isCurrent && (
           <span className="inline-block text-[10px] font-bold uppercase tracking-wider mb-1 px-2 py-0.5 rounded-full text-(--action-primary) bg-(--action-primary)/10">
             현재 위치
