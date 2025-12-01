@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import NavigationCard from "./navigation/NavigationCard";
-import DestinationSearch from "../destination/DestinationSearch";
+import DestinationSearch from "./destination/DestinationSearch";
 import Debug from "./debug/Debug";
 import { NavData } from "./types";
 import { calculateDestination } from "@/app/lib/action";

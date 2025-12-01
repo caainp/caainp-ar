@@ -1,4 +1,4 @@
-import { MapPin } from "../overlay/Icons";
+import { MapPin } from "../Icons";
 
 export default function DestinationSelectButton({
   destination,

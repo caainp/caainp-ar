@@ -1,4 +1,4 @@
-import { Search } from "../overlay/Icons";
+import { Search } from "../Icons";
 
 export default function DestinationInput({
   inputRef,

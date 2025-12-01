@@ -3,9 +3,9 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { animate, createScope, stagger } from "animejs"; // animejs import
 import DestinationInput from "./DestinationInput";
-import { useOverlayContext } from "../overlay/OverlayContext";
+import { useOverlayContext } from "../OverlayContext";
 import DestinationSearchContent from "./DestinationSearchContent";
-import SettingButton from "../overlay/setting/SettingButton";
+import SettingButton from "../setting/SettingButton";
 
 // TODO: 임시 목적지 목록
 export const SAMPLE_DESTINATIONS = [
