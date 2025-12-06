@@ -15,14 +15,14 @@ export interface OverlayContextValue {
   handleRemoveRecentDestination: (destination: string) => void;
   handleRemoveAllRecentDestinations: () => void;
   handleStepChange: (newStep: number) => void;
-  handleDebugCapture: (captureImage: string | Blob) => Promise<void>;
   setting: boolean;
   setSetting: Dispatch<SetStateAction<boolean>>;
   debug: boolean;
   setDebug: Dispatch<SetStateAction<boolean>>;
-  handleDebugUpdateNav: () => Promise<void>;
   palette: string;
   setPalette: Dispatch<SetStateAction<string>>;
+  isCaptureLoopEnabled: boolean;
+  setIsCaptureLoopEnabled: Dispatch<SetStateAction<boolean>>;
 }
 
 const OverlayContext = createContext<OverlayContextValue | undefined>(

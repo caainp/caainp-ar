@@ -1,30 +1,11 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
+import React, { useState, useRef, useLayoutEffect } from "react";
 import { animate, createScope, stagger } from "animejs"; // animejs import
 import DestinationInput from "./DestinationInput";
 import { useOverlayContext } from "../OverlayContext";
 import DestinationSearchContent from "./DestinationSearchContent";
 import SettingButton from "../setting/SettingButton";
-
-// TODO: 임시 목적지 목록
-export const SAMPLE_DESTINATIONS = [
-  "401호 강의실",
-  "402호 강의실",
-  "403호 강의실",
-  "404호 강의실",
-  "405호 강의실",
-  "406호 강의실",
-  "407호 강의실",
-  "408호 강의실",
-  "409호 강의실",
-  "410호 강의실",
-  "화장실",
-  "도서관",
-  "학생식당",
-  "행정실",
-  "교수연구실",
-];
 
 export default function DestinationSearch() {
   const {
@@ -32,6 +13,7 @@ export default function DestinationSearch() {
     recentDestinations,
     handleRemoveAllRecentDestinations,
   } = useOverlayContext();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -41,9 +23,6 @@ export default function DestinationSearch() {
   const listRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const scopeRef = useRef<ReturnType<typeof createScope> | null>(null);
-  const filteredDestinations = SAMPLE_DESTINATIONS.filter((dest) =>
-    dest.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const handleSelect = (destination: string) => {
     handleSelectDestination(destination);
@@ -52,39 +31,37 @@ export default function DestinationSearch() {
     inputRef.current?.blur();
   };
 
-  const hasSearchResults =
-    searchQuery.length > 0 && filteredDestinations.length > 0;
+  const hasSearchQuery = searchQuery.length > 0;
 
-  const hasNoSearchResults =
-    searchQuery.length > 0 && filteredDestinations.length === 0;
+  // 현재 보여줄 상태 결정
+  const getViewState = (): "instruction" | "hidden" | "querying" => {
+    if (!isFocused) {
+      return "hidden";
+    }
 
-  const hasRecentDestinations = recentDestinations.length > 0;
+    if (!hasSearchQuery) {
+      return "instruction";
+    }
 
-  // 현재 보여줄 상태 결정 (애니메이션 로직 단순화를 위해 변수로 관리)
-  const viewState = hasSearchResults
-    ? "results"
-    : hasNoSearchResults
-    ? "empty"
-    : isFocused
-    ? hasRecentDestinations
-      ? "recent"
-      : "instruction"
-    : "hidden";
+    return "querying";
+  };
+
+  const viewState = getViewState();
 
   useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    scopeRef.current = createScope({ root: rootRef }).add((self) => {
+    scopeRef.current = createScope({ root: rootRef }).add(() => {
       const targetHeight =
         viewState === "hidden" ? 0 : listRef.current?.scrollHeight || 0;
-
+        
       animate(container, {
         height: targetHeight,
         duration: 250,
         easing: "easeOutQuad",
       });
 
-      if (viewState === "results" || viewState === "recent") {
+      if (viewState === "instruction") {
         animate(container, {
           opacity: [0, 1],
           duration: 250,
@@ -98,22 +75,33 @@ export default function DestinationSearch() {
           duration: 350,
           easing: "easeOutQuad",
         });
+      } else if (viewState === "querying") {
+        animate(container, {
+          opacity: 1,
+          duration: 0,
+          easing: "easeOutQuad",
+        });
+        animate(".anim-item", {
+          opacity: 1,
+          translateY: 0,
+          filter: "blur(0px)",
+          duration: 0,
+          easing: "easeOutQuad",
+        });        
       }
+      
+      return () => scopeRef.current?.revert();
     });
-
-    return () => scopeRef.current?.revert();
   }, [
     viewState,
-    filteredDestinations,
     recentDestinations,
-    searchQuery,
     isFocused,
   ]);
 
   return (
     <div
       ref={rootRef}
-      className="w-full max-w-sm mx-auto pointer-events-auto bg-(--bg-card)/80 backdrop-blur-xl rounded-[2rem] overflow-hidden shadow-2xl 
+      className="w-full max-w-sm mx-auto pointer-events-auto bg-(--bg-card)/80 backdrop-blur-xl rounded-4xl overflow-hidden shadow-2xl 
       ring-1 ring-white/10 border border-white/10"
     >
       {/* 검색 입력 필드 */}
@@ -138,7 +126,7 @@ export default function DestinationSearch() {
         <div ref={listRef}>
           <DestinationSearchContent
             viewState={viewState}
-            filteredDestinations={filteredDestinations}
+            searchQuery={searchQuery}
             recentDestinations={recentDestinations}
             onSelectDestination={handleSelect}
             onRemoveAllRecentDestinations={handleRemoveAllRecentDestinations}

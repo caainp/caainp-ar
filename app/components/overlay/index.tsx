@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import NavigationCard from "./navigation/NavigationCard";
 import DestinationSearch from "./destination/DestinationSearch";
 import Debug from "./debug/Debug";
@@ -9,21 +9,9 @@ import { calculateDestination } from "@/app/lib/action";
 import { OverlayProvider, useOverlayContext } from "./OverlayContext";
 import SettingWrapper from "./setting/SettingWrapper";
 import RouteSummary from "./route/RouteSummary";
-
-const dataUrlToFile = (dataUrl: string, filename: string) => {
-  const [header, data] = dataUrl.split(",");
-  const mimeMatch = header.match(/:(.*?);/);
-  const mime = mimeMatch ? mimeMatch[1] : "image/png";
-  const binary = atob(data);
-  const len = binary.length;
-  const array = new Uint8Array(len);
-
-  for (let i = 0; i < len; i += 1) {
-    array[i] = binary.charCodeAt(i);
-  }
-
-  return new File([array], filename, { type: mime });
-};
+import { fetchNavigationStep } from "@/app/lib/api";
+import { useCameraCapture } from "@/app/hooks/useCameraCapture";
+import CaptureLoopNavigation from "./CaptureLoopNavigation";
 
 const initialNavData: NavData = {
   schema_version: 1,
@@ -40,36 +28,72 @@ const initialNavData: NavData = {
     remaining_steps_text: "",
     via_nodes: [],
   },
-  destination: null,
+  destination: ""
 };
 
 export default function Overlay() {
   const [debug, setDebug] = useState(false);
   const [setting, setSetting] = useState(false);
   const [navData, setNavData] = useState<NavData>(initialNavData);
+  const [isCaptureLoopEnabled, setIsCaptureLoopEnabled] = useState(true);
   const [recentDestinations, setRecentDestinations] = useState<string[]>([]);
   const [isLoadingDestination, setIsLoadingDestination] = useState(false);
   const [palette, setPalette] = useState<string>("soft");
+  const { captureScreen } = useCameraCapture();
+
+  const createBlackImage = (): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 640;
+      canvas.height = 480;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const file = new File([blob], "black-placeholder.jpg", { type: "image/jpeg" });
+            resolve(file);
+          } else {
+            throw new Error("Failed to create black image");
+          }
+        },
+        "image/jpeg",
+        0.9
+      );
+    });
+  };
 
   const handleSelectDestination = async (destination: string) => {
     // 초기화
     setNavData(initialNavData);
-
+    setRecentDestinations((prev) => [destination, ...prev.filter((d) => d !== destination)]);
     setIsLoadingDestination(true);
 
-    // 이미 최근 검색에 있는 목적지라면 제거 하고 최근 검색 목록의 맨 앞에 추가
-    setRecentDestinations((prev) => {
-      if (prev.includes(destination)) {
-        return [destination, ...prev.filter((d) => d !== destination)];
-      }
-      return [destination, ...prev];
-    });
-
     try {
-      const formData = new FormData();
-      formData.append("destination", destination);
-      const newNavData = await calculateDestination(formData);
-      setNavData(newNavData);
+      const captureResult = await captureScreen({ format: "blob", download: false });
+      let imageFile: File | null = null;
+
+      if (captureResult instanceof Blob) {
+        imageFile = new File([captureResult], "capture.jpg", { type: "image/jpeg" });
+      }
+
+      // =========== DEBUG ============
+      // const response = await fetchNavigationStep(destination, imageFile as File);
+      // console.log(response);
+      // =========== DEBUG ============
+
+      if (!imageFile) {
+        imageFile = await createBlackImage();
+      }
+
+      const stepResponse = await fetchNavigationStep(destination, imageFile);
+      setNavData({
+        ...stepResponse,
+        destination,
+      });
     } catch (error) {
       console.error(error);
     } finally {
@@ -99,55 +123,7 @@ export default function Overlay() {
     }));
   };
 
-  const handleDebugCapture = useCallback(
-    async (captureImage: string | Blob) => {
-      if (!captureImage) {
-        return;
-      }
-
-      // setIsLoadingDestination(true);
-      const destinationLabel = navData.destination ?? "DESTINATION";
-
-      try {
-        const formData = new FormData();
-        formData.append("destination", destinationLabel);
-
-        let captureFile: File;
-        const filename = `ar-capture-${Date.now()}.jpg`;
-
-        if (captureImage instanceof Blob) {
-          captureFile = new File([captureImage], filename, {
-            type: "image/jpeg",
-          });
-        } else {
-          captureFile = dataUrlToFile(captureImage, filename);
-        }
-
-        formData.append("captureImage", captureFile);
-
-        const newNavData = await calculateDestination(formData);
-        setNavData(newNavData);
-      } catch (error) {
-        console.error("Debug Capture Error:", error);
-      } finally {
-        // setIsLoadingDestination(false);
-      }
-    },
-    [navData.destination]
-  );
-
-  const handleDebugUpdateNav = useCallback(async () => {
-    const destinationLabel = navData.destination ?? "DESTINATION";
-
-    try {
-      const formData = new FormData();
-      formData.append("destination", destinationLabel);
-      const newNavData = await calculateDestination(formData);
-      setNavData(newNavData);
-    } catch (error) {
-      console.error(error);
-    }
-  }, [navData.destination]);
+  
 
   useEffect(() => {
     if (palette === "default") {
@@ -171,14 +147,14 @@ export default function Overlay() {
         handleRemoveRecentDestination,
         handleRemoveAllRecentDestinations,
         handleStepChange,
-        handleDebugCapture,
         setting,
         setSetting,
         debug,
         setDebug,
-        handleDebugUpdateNav,
         palette,
         setPalette,
+        isCaptureLoopEnabled,
+        setIsCaptureLoopEnabled,
       }}
     >
       <OverlayTopSheet />
@@ -198,7 +174,16 @@ function OverlayTopSheet() {
           <DestinationSearch />
         </div>
       )}
-      {(navData.destination || isLoadingDestination) && <NavigationCard />}
+      {(navData.destination || isLoadingDestination) && (
+        <>
+          <NavigationCard />
+          {navData.destination && !isLoadingDestination && (
+            <div className="pt-2 pl-2">
+              <CaptureLoopNavigation />
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

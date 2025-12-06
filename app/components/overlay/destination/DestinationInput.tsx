@@ -23,7 +23,7 @@ export default function DestinationInput({
         onChange={(e) => setSearchQuery(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        placeholder="목적지 검색"
+        placeholder="쿼리 검색"
         className="w-full bg-(--bg-secondary)/50 hover:bg-(--bg-secondary) focus:bg-(--bg-card) rounded-3xl py-3.5 pl-11 pr-10 
           text-(--text-primary) text-[15px] placeholder-(--text-muted) transition-all duration-200
           focus:outline-none focus:ring-2 focus:ring-(--ring-primary)/50 ring-1 ring-transparent focus:shadow-lg"
@@ -32,7 +32,6 @@ export default function DestinationInput({
         <button
           onClick={() => {
             setSearchQuery("");
-            inputRef.current?.focus();
           }}
           className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-tertiary) transition-all"
         >

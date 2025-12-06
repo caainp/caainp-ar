@@ -29,7 +29,7 @@ export default function NavigationCardHeader({
         ) : (
           navData.destination && (
             <>
-              <p className="text-xs text-(--text-tertiary)">목적지</p>
+              <p className="text-xs text-(--text-tertiary)">쿼리</p>
               <p className="text-base text-(--text-primary)">
                 {navData.destination}
               </p>

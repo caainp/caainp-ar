@@ -1,34 +1,78 @@
-import { SAMPLE_DESTINATIONS } from "./DestinationSearch";
 import DestinationSelectButton from "./DestinationSelectButton";
+import { Search } from "../Icons";
 
-type ViewState = "results" | "empty" | "recent" | "instruction" | "hidden";
+type ViewState = "instruction" | "hidden" | "querying";
 
 type DestinationSearchContentProps = {
   viewState: ViewState;
-  filteredDestinations: string[];
+  searchQuery: string;
   recentDestinations: string[];
   onSelectDestination: (destination: string) => void;
   onRemoveAllRecentDestinations: () => void;
 };
 
-function DestinationSearchContentDefaultList({
+function DestinationSearchContentQuerying({
+  searchQuery,
   onSelectDestination,
 }: {
+  searchQuery: string;
   onSelectDestination: (destination: string) => void;
 }) {
   return (
+    <div className="max-h-72 overflow-y-auto p-2 custom-scrollbar">
+      <div className="px-2 pt-2 pb-2">
+        <button
+          onClick={() => onSelectDestination(searchQuery)}
+          onMouseDown={(event) => event.preventDefault()}
+          className="w-full flex items-center gap-3.5 px-3 py-3 rounded-xl hover:bg-(--bg-secondary)/80 active:bg-(--bg-secondary) transition-all text-left cursor-pointer group fade-in"
+        >
+          <div className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-(--bg-secondary) text-(--text-secondary) group-hover:bg-(--bg-tertiary) group-hover:text-(--text-primary) transition-colors">
+            <Search size={18} />
+          </div>
+          <div className="flex flex-col flex-1 min-w-0">
+            <span className="text-(--text-primary) text-[15px] font-medium leading-snug group-hover:text-white transition-colors truncate">
+              &quot;{searchQuery}&quot; 검색하기
+            </span>
+            <span className="text-(--text-muted) text-xs">
+              쿼리로 길안내 시작
+            </span>
+          </div>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function DestinationSearchContentRecent({
+  recentDestinations,
+  onSelectDestination,
+  onRemoveAllRecentDestinations,
+}: {
+  recentDestinations: string[];
+  onSelectDestination: (destination: string) => void;
+  onRemoveAllRecentDestinations: () => void;
+}) {
+  return (
     <>
-      <div className="px-4 pt-4 pb-2">
+      <div className="px-4 pt-4 pb-2 flex items-center justify-between">
         <span className="text-(--text-tertiary) text-[11px] font-semibold uppercase tracking-wider">
-          추천 목적지
+          최근 검색
         </span>
+        <button
+          onClick={onRemoveAllRecentDestinations}
+          onMouseDown={(event) => event.preventDefault()}
+          className="text-[11px] text-(--text-muted) hover:text-(--text-primary) transition-colors px-2 py-1 rounded-md hover:bg-(--bg-secondary)"
+        >
+          모두 삭제
+        </button>
       </div>
       <div className="space-y-1">
-        {SAMPLE_DESTINATIONS.map((destination) => (
-          <div key={destination} className="anim-item">
+        {recentDestinations.map((destination: string) => (
+          <div key={destination} className="anim-item opacity-0">
             <DestinationSelectButton
               onClick={() => onSelectDestination(destination)}
               destination={destination}
+              isRecent
             />
           </div>
         ))}
@@ -39,78 +83,47 @@ function DestinationSearchContentDefaultList({
 
 export default function DestinationSearchContent({
   viewState,
-  filteredDestinations,
+  searchQuery,
   recentDestinations,
   onSelectDestination,
   onRemoveAllRecentDestinations,
 }: DestinationSearchContentProps) {
   switch (viewState) {
-    case "results":
-      return (
-        <div className="max-h-72 overflow-y-auto p-2 custom-scrollbar">
-          <div className="space-y-1">
-            {filteredDestinations.map((destination) => (
-              <div key={destination} className="anim-item">
-                <DestinationSelectButton
-                  onClick={() => onSelectDestination(destination)}
-                  destination={destination}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    case "empty":
-      return (
-        <div className="py-16 px-4 fade-in flex flex-col items-center justify-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-(--bg-secondary) flex items-center justify-center text-(--text-muted)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </div>
-          <p className="text-(--text-muted) text-sm font-medium">
-            검색 결과가 없습니다
-          </p>
-        </div>
-      );
-    case "recent":
-      return (
-        <div className="max-h-72 overflow-y-auto p-2 custom-scrollbar">
-          <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-            <span className="text-(--text-tertiary) text-[11px] font-semibold uppercase tracking-wider">
-              최근 검색
-            </span>
-            <button
-              onClick={onRemoveAllRecentDestinations}
-              onMouseDown={(event) => event.preventDefault()}
-              className="text-[11px] text-(--text-muted) hover:text-(--text-primary) transition-colors px-2 py-1 rounded-md hover:bg-(--bg-secondary)"
-            >
-              모두 삭제
-            </button>
-          </div>
-          <div className="space-y-1">
-            {recentDestinations.map((destination: string) => (
-              <div key={destination} className="anim-item opacity-0">
-                <DestinationSelectButton
-                  onClick={() => onSelectDestination(destination)}
-                  destination={destination}
-                  isRecent
-                />
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 border-t border-white/5">
-             {DestinationSearchContentDefaultList({ onSelectDestination })}
-          </div>
-        </div>
-      );
     case "instruction":
       return (
         <div className="max-h-72 overflow-y-auto p-2 custom-scrollbar">
           <div className="py-8 px-4 fade-in text-center">
-             <p className="text-(--text-muted) text-sm">
-              목적지를 검색하여<br/>길안내를 시작하세요
+            <p className="text-(--text-muted) text-sm">
+              쿼리를 작성하여
+              <br />
+              길안내를 시작하세요
             </p>
           </div>
-          {DestinationSearchContentDefaultList({ onSelectDestination })}
+          {recentDestinations.length > 0 && (
+            <div className="border-t border-white/5">
+              <DestinationSearchContentRecent
+                recentDestinations={recentDestinations}
+                onSelectDestination={onSelectDestination}
+                onRemoveAllRecentDestinations={onRemoveAllRecentDestinations}
+              />
+            </div>
+          )}
+        </div>
+      );
+    case "querying":
+      return (
+        <div className="max-h-72 overflow-y-auto p-2 custom-scrollbar">
+          <div className="border-b border-white/5">
+            <DestinationSearchContentQuerying
+              searchQuery={searchQuery}
+              onSelectDestination={onSelectDestination}
+            />
+          </div>
+          <DestinationSearchContentRecent
+            recentDestinations={recentDestinations}
+            onSelectDestination={onSelectDestination}
+            onRemoveAllRecentDestinations={onRemoveAllRecentDestinations}
+          />
         </div>
       );
     default:

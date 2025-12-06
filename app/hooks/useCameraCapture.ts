@@ -18,7 +18,7 @@ type CaptureOptions = {
    */
   format?: "base64" | "blob";
   /**
-   * 리사이징할 너비 (지정하지 않으면 원본 크기)
+   * 리사이징할 너비
    */
   width?: number;
   /**
