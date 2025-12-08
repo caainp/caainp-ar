@@ -10,7 +10,7 @@ export interface OverlayContextValue {
   setIsLoadingDestination: Dispatch<SetStateAction<boolean>>;
   recentDestinations: string[];
   setRecentDestinations: Dispatch<SetStateAction<string[]>>;
-  handleSelectDestination: (destination: string) => Promise<void>;
+  handleSelectDestination: (destination: string, startRoom: string) => Promise<void>;
   handleCancelDestination: () => void;
   handleRemoveRecentDestination: (destination: string) => void;
   handleRemoveAllRecentDestinations: () => void;

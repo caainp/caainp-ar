@@ -1,7 +1,6 @@
 import DestinationSelectButton from "./DestinationSelectButton";
 import { Search } from "../Icons";
-
-type ViewState = "instruction" | "hidden" | "querying";
+import { ViewState } from "./DestinationSearch";
 
 type DestinationSearchContentProps = {
   viewState: ViewState;

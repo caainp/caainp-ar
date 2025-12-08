@@ -6,6 +6,9 @@ import DestinationInput from "./DestinationInput";
 import { useOverlayContext } from "../OverlayContext";
 import DestinationSearchContent from "./DestinationSearchContent";
 import SettingButton from "../setting/SettingButton";
+import DestinationSearchContentStartRoomSelection from "./DestinationSearchContentStartRoomSelection";
+
+export type ViewState = "instruction" | "hidden" | "querying";
 
 export default function DestinationSearch() {
   const {
@@ -14,9 +17,13 @@ export default function DestinationSearch() {
     handleRemoveAllRecentDestinations,
   } = useOverlayContext();
 
+  const [startRoom, setStartRoom] = useState("");
+  const [destination, setDestination] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [openStartRoomSelection, setOpenStartRoomSelection] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const destinationInputRef = useRef<HTMLInputElement>(null);
+  const startRoomInputRef = useRef<HTMLInputElement>(null);
 
   // 애니메이션을 위한 Refs
   const containerRef = useRef<HTMLDivElement>(null);
@@ -25,16 +32,34 @@ export default function DestinationSearch() {
   const scopeRef = useRef<ReturnType<typeof createScope> | null>(null);
 
   const handleSelect = (destination: string) => {
-    handleSelectDestination(destination);
+    setDestination(destination);
+    setOpenStartRoomSelection(true);
+    startRoomInputRef.current?.focus();
+  };
+
+  const handleSelectRoom = (startRoom: string) => {
+    setStartRoom(startRoom);
+  };
+
+  const requestSelectDestination = () => {
+    console.log("requestSelectDestination", destination, startRoom);
+    handleSelectDestination(destination, startRoom);
+    cleanUpWithSelectDestination();
+  };
+
+  const cleanUpWithSelectDestination = () => {
     setSearchQuery("");
+    setDestination("");
+    setStartRoom("");
     setIsFocused(false);
-    inputRef.current?.blur();
+    setOpenStartRoomSelection(false);
+    destinationInputRef.current?.blur();
   };
 
   const hasSearchQuery = searchQuery.length > 0;
 
   // 현재 보여줄 상태 결정
-  const getViewState = (): "instruction" | "hidden" | "querying" => {
+  const getViewState = (): ViewState => {
     if (!isFocused) {
       return "hidden";
     }
@@ -95,6 +120,7 @@ export default function DestinationSearch() {
   }, [
     viewState,
     recentDestinations,
+    openStartRoomSelection,
     isFocused,
   ]);
 
@@ -107,7 +133,7 @@ export default function DestinationSearch() {
       {/* 검색 입력 필드 */}
       <div className="p-2 relative z-10 bg-(--bg-card) flex items-center gap-2">
         <DestinationInput
-          inputRef={inputRef as React.RefObject<HTMLInputElement>}
+          inputRef={destinationInputRef as React.RefObject<HTMLInputElement>}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           setIsFocused={setIsFocused}
@@ -124,13 +150,22 @@ export default function DestinationSearch() {
         {/* 상단 약간 그림자 */}
         {/* <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-zinc-900 to-transparent" /> */}
         <div ref={listRef}>
-          <DestinationSearchContent
+          {!openStartRoomSelection && <DestinationSearchContent
             viewState={viewState}
             searchQuery={searchQuery}
             recentDestinations={recentDestinations}
             onSelectDestination={handleSelect}
             onRemoveAllRecentDestinations={handleRemoveAllRecentDestinations}
-          />
+          />}
+          {openStartRoomSelection && (
+            <DestinationSearchContentStartRoomSelection
+              onSelectRoom={handleSelectRoom}
+              setIsFocused={setIsFocused}
+              onRequestSelectDestination={requestSelectDestination}
+              cleanUpWithSelectDestination={cleanUpWithSelectDestination}
+              startRoomInputRef={startRoomInputRef as React.RefObject<HTMLInputElement>}
+            />
+          )}
         </div>
       </div>
     </div>

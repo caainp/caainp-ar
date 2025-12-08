@@ -5,11 +5,10 @@ import NavigationCard from "./navigation/NavigationCard";
 import DestinationSearch from "./destination/DestinationSearch";
 import Debug from "./debug/Debug";
 import { NavData } from "./types";
-import { calculateDestination } from "@/app/lib/action";
 import { OverlayProvider, useOverlayContext } from "./OverlayContext";
 import SettingWrapper from "./setting/SettingWrapper";
 import RouteSummary from "./route/RouteSummary";
-import { fetchNavigationStep } from "@/app/lib/api";
+import { fetchNavigationStart } from "@/app/lib/api";
 import { useCameraCapture } from "@/app/hooks/useCameraCapture";
 import CaptureLoopNavigation from "./CaptureLoopNavigation";
 
@@ -66,7 +65,7 @@ export default function Overlay() {
     });
   };
 
-  const handleSelectDestination = async (destination: string) => {
+  const handleSelectDestination = async (destination: string, startRoom: string) => {
     // 초기화
     setNavData(initialNavData);
     setRecentDestinations((prev) => [destination, ...prev.filter((d) => d !== destination)]);
@@ -89,9 +88,10 @@ export default function Overlay() {
         imageFile = await createBlackImage();
       }
 
-      const stepResponse = await fetchNavigationStep(destination, imageFile);
+      // const stepResponse = await fetchNavigationStep(destination, imageFile);
+      const startResponse = await fetchNavigationStart(destination, startRoom, imageFile);
       setNavData({
-        ...stepResponse,
+        ...startResponse,
         destination,
       });
     } catch (error) {
@@ -177,11 +177,6 @@ function OverlayTopSheet() {
       {(navData.destination || isLoadingDestination) && (
         <>
           <NavigationCard />
-          {navData.destination && !isLoadingDestination && (
-            <div className="pt-2 pl-2">
-              <CaptureLoopNavigation />
-            </div>
-          )}
         </>
       )}
     </div>
@@ -189,13 +184,18 @@ function OverlayTopSheet() {
 }
 
 function OverlayBottomSheet() {
-  const { navData, debug } = useOverlayContext();
+  const { navData, debug, isLoadingDestination } = useOverlayContext();
   return (
     <div className="absolute bottom-0 left-0 right-0 h-fit flex flex-col justify-between font-sans antialiased text-(--text-white)">
       {/* Debug */}
       {navData.destination && debug && (
         <div className="relative mx-auto max-w-sm w-full pointer-events-auto mb-2 p-4 gap-2 flex flex-col">
           <Debug />
+        </div>
+      )}
+      {navData.destination && !isLoadingDestination && (
+        <div className="pb-4 m-auto">
+          <CaptureLoopNavigation />
         </div>
       )}
       {navData.destination && <RouteSummary />}
