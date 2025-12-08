@@ -6,6 +6,7 @@ import { useState, useCallback } from "react";
 import { fetchNavigationStep } from "@/app/lib/api";
 import { Camera, CameraOff, Loader2 } from "lucide-react";
 import { useCameraContext } from "../Camera";
+import { createBlackImage } from ".";
 
 export default function CaptureLoopNavigation() {
   const { setNavData } = useOverlayContext();
@@ -17,10 +18,10 @@ export default function CaptureLoopNavigation() {
   const performCaptureAndUpdate = useCallback(async () => {
     if (isProcessing || isCapturing) return;
 
-    if (!isWebcamEnabled) {
-      enableWebcam();
-      return;
-    }
+    // if (!isWebcamEnabled) {
+    //   enableWebcam();
+    //   return;
+    // }
 
     setIsProcessing(true);
     try {
@@ -29,18 +30,24 @@ export default function CaptureLoopNavigation() {
         download: false,
       });
 
+      let imageFile: File | null = null;
+
       if (captureResult instanceof Blob) {
-        const imageFile = new File([captureResult], "capture.jpg", {
+        imageFile = new File([captureResult], "capture.jpg", {
           type: "image/jpeg",
         });
-
-        const stepResponse = await fetchNavigationStep(imageFile);
-
-        setNavData((prev) => ({
-          ...stepResponse,
-          destination: prev.destination,
-        }));
       }
+
+      if (!imageFile) {
+        imageFile = await createBlackImage();
+      }
+
+      const stepResponse = await fetchNavigationStep(imageFile);
+
+      setNavData((prev) => ({
+        ...stepResponse,
+        destination: prev.destination,
+      }));
     } catch (error) {
       console.error("Capture Loop Error:", error);
     } finally {

@@ -13,11 +13,19 @@ export async function POST(request: Request) {
     );
   }
 
+  const cookieHeader = request.headers.get("cookie");
+
   const externalFormData = new FormData();
   externalFormData.append("image", image);
 
+  const headers: HeadersInit = {};
+  if (cookieHeader) {
+    headers["Cookie"] = cookieHeader;
+  }
+
   const response = await fetch(`${EXTERNAL_API_URL}/api/navigation/step`, {
     method: "POST",
+    headers,
     body: externalFormData,
   });
 
@@ -35,6 +43,13 @@ export async function POST(request: Request) {
   }
 
   const data = await response.json();
-  return NextResponse.json(data);
+  const nextResponse = NextResponse.json(data);
+
+  const setCookieHeaders = response.headers.getSetCookie();
+  setCookieHeaders.forEach((cookie) => {
+    nextResponse.headers.append("set-cookie", cookie);
+  });
+
+  return nextResponse;
 }
 
