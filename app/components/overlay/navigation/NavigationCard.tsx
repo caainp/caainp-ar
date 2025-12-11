@@ -30,14 +30,13 @@ export default function NavigationCard() {
   return (
     <div ref={rootRef} className="w-full mx-auto bg-(--bg-card)
      rounded-b-4xl overflow-hidden shadow-2xl ring-1 ring-(--bg-secondary)/70">
-      
       {/* 네비게이션 헤더 */}
       <div className="flex flex-col p-2 gap-2">
         {/* 이전 돌아가기, 설정 버튼 */}
         <NavigationCardHeader 
           handleCancelDestination={handleCancelDestination} 
-          setSetting={setSetting} 
-          navData={navData} 
+          setSetting={setSetting}
+          navData={navData}
           isLoading={isLoadingDestination}
         />
 

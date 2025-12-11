@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useLayoutEffect } from "react";
-import { animate, createScope, stagger } from "animejs"; // animejs import
+import React, { useState, useRef, useLayoutEffect, useMemo } from "react";
+import { animate, createScope, stagger } from "animejs";
 import DestinationInput from "./DestinationInput";
 import { useOverlayContext } from "../OverlayContext";
 import DestinationSearchContent from "./DestinationSearchContent";
@@ -15,21 +15,40 @@ export default function DestinationSearch() {
     handleSelectDestination,
     recentDestinations,
     handleRemoveAllRecentDestinations,
+    demo,
+    demoSearchQuery,
   } = useOverlayContext();
 
   const [startRoom, setStartRoom] = useState("");
   const [destination, setDestination] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [localSearchQuery, setLocalSearchQuery] = useState("");
   const [openStartRoomSelection, setOpenStartRoomSelection] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const destinationInputRef = useRef<HTMLInputElement>(null);
   const startRoomInputRef = useRef<HTMLInputElement>(null);
 
-  // 애니메이션을 위한 Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const scopeRef = useRef<ReturnType<typeof createScope> | null>(null);
+
+  // 데모 모드일 때는 demoSearchQuery 사용, 아니면 localSearchQuery 사용
+  const isDemoSearching = demo.enableDemoMode && demo.isPlaying && demo.phase === "searching";
+  const searchQuery = isDemoSearching ? demoSearchQuery : localSearchQuery;
+  
+  const setSearchQuery = (query: string) => {
+    if (!isDemoSearching) {
+      setLocalSearchQuery(query);
+    }
+  };
+
+  // 데모 모드에서 검색 중일 때 자동으로 포커스
+  const effectiveFocused = useMemo(() => {
+    if (isDemoSearching && demoSearchQuery.length > 0) {
+      return true;
+    }
+    return isFocused;
+  }, [isDemoSearching, demoSearchQuery, isFocused]);
 
   const handleSelect = (destination: string) => {
     setDestination(destination);
@@ -48,7 +67,7 @@ export default function DestinationSearch() {
   };
 
   const cleanUpWithSelectDestination = () => {
-    setSearchQuery("");
+    setLocalSearchQuery("");
     setDestination("");
     setStartRoom("");
     setIsFocused(false);
@@ -58,9 +77,8 @@ export default function DestinationSearch() {
 
   const hasSearchQuery = searchQuery.length > 0;
 
-  // 현재 보여줄 상태 결정
   const getViewState = (): ViewState => {
-    if (!isFocused) {
+    if (!effectiveFocused) {
       return "hidden";
     }
 
@@ -121,7 +139,7 @@ export default function DestinationSearch() {
     viewState,
     recentDestinations,
     openStartRoomSelection,
-    isFocused,
+    effectiveFocused,
   ]);
 
   return (
@@ -147,8 +165,6 @@ export default function DestinationSearch() {
         className="relative overflow-hidden bg-(--bg-card)"
         style={{ height: 0 }}
       >
-        {/* 상단 약간 그림자 */}
-        {/* <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-zinc-900 to-transparent" /> */}
         <div ref={listRef}>
           {!openStartRoomSelection && <DestinationSearchContent
             viewState={viewState}

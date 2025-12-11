@@ -16,17 +16,14 @@ export interface NavigationStepResponse {
   route_summary: RouteSummary;
 }
 
-export async function fetchNavigationStart(
-  requestText: string,
-  startRoom: string,
-  image: File
-): Promise<NavigationStartResponse> {
+export async function fetchNavigationStart({ requestText, startRoom, image, enableDemoMode = false }: 
+  { requestText: string, startRoom: string, image: File, enableDemoMode?: boolean }): Promise<NavigationStartResponse> {
   const formData = new FormData();
   formData.append("request_text", requestText);
   formData.append("start_room", startRoom.toString());
   formData.append("image", image);
 
-  const response = await fetch("/api/navigation/start", {
+  const response = await fetch(enableDemoMode ? "/api/navigation/start/demo" : "/api/navigation/start", {
     method: "POST",
     body: formData,
   });
@@ -40,13 +37,11 @@ export async function fetchNavigationStart(
   return data;
 }
 
-export async function fetchNavigationStep(
-  image: File
-): Promise<NavigationStepResponse> {
+export async function fetchNavigationStep({ image, enableDemoMode = false }: { image: File, enableDemoMode?: boolean }): Promise<NavigationStepResponse> {  
   const formData = new FormData();
   formData.append("image", image);
 
-  const response = await fetch("/api/navigation/step", {
+  const response = await fetch(enableDemoMode ? "/api/navigation/step/demo" : "/api/navigation/step", {
     method: "POST",
     body: formData,
   });

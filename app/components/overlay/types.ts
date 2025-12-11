@@ -27,3 +27,13 @@ export interface NavData {
   route_summary: RouteSummary;
   destination: string | null;
 }
+
+export type DemoPhase = "idle" | "intro" | "searching" | "navigating" | "completed";
+
+export interface DemoData {
+  enableDemoMode: boolean;
+  isPanelOpen: boolean;
+  isPlaying: boolean;
+  phase: DemoPhase;
+  currentScenarioStep: number;
+}

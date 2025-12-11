@@ -1,9 +1,9 @@
-import SceneWithOverlay from "./components/SceneWithOverlay";
+import CameraWithOverlay from "./components/CameraWithOverlay";
 
 export const App = () => {
   return (
     <>
-      <SceneWithOverlay />
+      <CameraWithOverlay />
     </>
   );
 };

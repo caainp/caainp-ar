@@ -1,6 +1,55 @@
 import { ArrowLeft, Settings } from "lucide-react";
 import { NavData } from "../types";
 import NavigationCardHeaderLoading from "../../loading/NavigationCardHeaderLoading";
+import { useRef, useState, useEffect } from "react";
+
+function DestinationText({ text }: { text: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLParagraphElement>(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (containerRef.current && measureRef.current) {
+        setIsOverflowing(measureRef.current.scrollWidth > containerRef.current.clientWidth);
+      }
+    };
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [text]);
+
+  return (
+    <div ref={containerRef} className="relative max-w-[200px]">
+      <p
+        className={`${isOverflowing ? "text-sm leading-tight" : "text-base"} text-(--text-primary) wrap-break-word`}
+        style={
+          isOverflowing
+            ? {
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }
+            : {
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }
+        }
+      >
+        {text}
+      </p>
+      <p
+        ref={measureRef}
+        className="pointer-events-none absolute inset-0 invisible whitespace-nowrap"
+        aria-hidden
+      >
+        {text}
+      </p>
+    </div>
+  );
+}
 
 export default function NavigationCardHeader({
   handleCancelDestination,
@@ -30,9 +79,7 @@ export default function NavigationCardHeader({
           navData.destination && (
             <>
               <p className="text-xs text-(--text-tertiary)">쿼리</p>
-              <p className="text-base text-(--text-primary)">
-                {navData.destination}
-              </p>
+              <DestinationText text={navData.destination} />
             </>
           )
         )}

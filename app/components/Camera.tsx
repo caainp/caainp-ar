@@ -34,7 +34,7 @@ export const useCameraContext = () => {
   return context;
 };
 
-export default function Camera({ children }: { children?: ReactNode }) {
+export default function Camera({ children, off = false }: { children?: ReactNode, off?: boolean }) {
   const webcamRef = useRef<WebcamRef>(null);
   const [isWebcamEnabled, setIsWebcamEnabled] = useState(true);
   const [hasCameraPermission, setHasCameraPermission] = useState(true);
@@ -104,7 +104,7 @@ export default function Camera({ children }: { children?: ReactNode }) {
         disableWebcam,
       }}
     >
-      {shouldShowCamera && (
+      {shouldShowCamera && !off && (
         <Webcam
           ref={webcamRef}
           audio={false}
@@ -126,10 +126,9 @@ export default function Camera({ children }: { children?: ReactNode }) {
           onUserMediaError={handleUserMediaError}
         />
       )}
-
-      <Activity mode={shouldShowCamera ? "hidden" : "visible"}>
+      {!off && <Activity mode={shouldShowCamera ? "hidden" : "visible"}>
         <CameraOffBackground />
-      </Activity>
+      </Activity>}
       {children}
     </CameraContext.Provider>
   );

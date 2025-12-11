@@ -9,7 +9,7 @@ import Camera from "./Camera";
 //   loading: () => <p className="text-white">Loading...</p>,
 // });
 
-export default function SceneWithOverlay() {
+export default function CameraWithOverlay() {
   return (
     <Camera>
       <Overlay />

@@ -1,13 +1,15 @@
 "use client";
 
 import { createContext, useContext, Dispatch, SetStateAction } from "react";
-import { NavData } from "./types";
+import { DemoData, NavData } from "./types";
 
 export interface OverlayContextValue {
   navData: NavData;
   setNavData: Dispatch<SetStateAction<NavData>>;
   isLoadingDestination: boolean;
   setIsLoadingDestination: Dispatch<SetStateAction<boolean>>;
+  isProcessing: boolean;
+  setIsProcessing: Dispatch<SetStateAction<boolean>>;
   recentDestinations: string[];
   setRecentDestinations: Dispatch<SetStateAction<string[]>>;
   handleSelectDestination: (destination: string, startRoom: string) => Promise<void>;
@@ -23,6 +25,14 @@ export interface OverlayContextValue {
   setPalette: Dispatch<SetStateAction<string>>;
   isCaptureLoopEnabled: boolean;
   setIsCaptureLoopEnabled: Dispatch<SetStateAction<boolean>>;
+  demo: DemoData;
+  setDemo: Dispatch<SetStateAction<DemoData>>;
+  startDemo: () => void;
+  stopDemo: () => void;
+  performDemoCapture: () => Promise<void>;
+  setDemoSearchQuery: (query: string) => void;
+  demoSearchQuery: string;
+  handleVideoTimeUpdate: (currentTime: number) => void;
 }
 
 const OverlayContext = createContext<OverlayContextValue | undefined>(

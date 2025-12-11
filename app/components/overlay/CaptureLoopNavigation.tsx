@@ -2,26 +2,19 @@
 
 import { useOverlayContext } from "./OverlayContext";
 import { useCameraCapture } from "@/app/hooks/useCameraCapture";
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { fetchNavigationStep } from "@/app/lib/api";
 import { Camera, CameraOff, Loader2 } from "lucide-react";
 import { useCameraContext } from "../Camera";
-import { createBlackImage } from ".";
+import { createBlackImage } from "@/app/lib/utils";
 
 export default function CaptureLoopNavigation() {
-  const { setNavData } = useOverlayContext();
+  const { setNavData, demo: { enableDemoMode }, isProcessing, setIsProcessing } = useOverlayContext();
   const { isWebcamEnabled, enableWebcam } = useCameraContext();
   const { captureScreen, isCapturing } = useCameraCapture();
-  
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const performCaptureAndUpdate = useCallback(async () => {
     if (isProcessing || isCapturing) return;
-
-    // if (!isWebcamEnabled) {
-    //   enableWebcam();
-    //   return;
-    // }
 
     setIsProcessing(true);
     try {
@@ -42,7 +35,7 @@ export default function CaptureLoopNavigation() {
         imageFile = await createBlackImage();
       }
 
-      const stepResponse = await fetchNavigationStep(imageFile);
+      const stepResponse = await fetchNavigationStep({ image: imageFile as File, enableDemoMode });
 
       setNavData((prev) => ({
         ...stepResponse,
@@ -53,7 +46,7 @@ export default function CaptureLoopNavigation() {
     } finally {
       setIsProcessing(false);
     }
-  }, [isProcessing, isCapturing, captureScreen, setNavData, isWebcamEnabled, enableWebcam]);
+  }, [isProcessing, isCapturing, captureScreen, setNavData, setIsProcessing, enableDemoMode]);
 
   return (
     <button
