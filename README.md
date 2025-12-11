@@ -58,12 +58,16 @@ pnpm dev
 
 주요 디렉토리 및 파일 구조는 다음과 같습니다.
 
-- **`app/`**: Next.js App Router 기반의 페이지 및 레이아웃
-- **`app/components/overlay/`**: 내비게이션 UI 컴포넌트 모음
-    - `DestinationSearch.tsx`: 목적지 검색 기능
-    - `NavigationCard.tsx`: 경로 안내 카드
-    - `setting/`: 설정 관련 컴포넌트
-- **`app/components/Camera*`**: 카메라 및 배경 처리 관련 컴포넌트
-    - `Camera.tsx`: 웹캠 피드 처리 및 래퍼
-    - `CameraOffBackground.tsx`: 카메라 꺼짐 상태 배경
+- **`app/page.tsx`**: 기본 카메라 + 오버레이 진입점
+- **`app/demo/page.tsx`**: 데모 시나리오용 페이지
+- **`app/api/`**: Next.js Route Handler
+  - `navigation/start|step/route.ts`: 외부 백엔드 프록시
+  - `navigation/.../demo/route.ts`: 데모용 Mock 응답
+  - `destination/route.ts`: 예시 목적지 검색 API
+- **`app/components/`**
+  - `Camera*.tsx`: 카메라 래퍼 및 오버레이 포함 레이아웃
+  - `overlay/`: 목적지 검색, 내비게이션 카드, 설정, 컨텍스트
+  - `demo/`: 데모 패널·비디오 컴포넌트
+- **`app/hooks/`**: `useCameraCapture`, `useDemo` 등
+- **`app/lib/`**: API Wrapper, 유틸
 ---
