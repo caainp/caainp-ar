@@ -8,7 +8,7 @@ https://caainp.kamilereon.net/
 
 - **실시간 카메라 오버레이**: `react-webcam`을 활용하여 실제 환경 위에 내비게이션 지시 사항과 정보를 시각적으로 표시합니다.
 - **목적지 검색**: 사용자 친화적인 검색 인터페이스를 통해 원하는 장소를 빠르고 간편하게 찾을 수 있음
-- **이 대화형 내비게이션**: 단계별 안내와 제공하여 길 찾기 경험을 향상
+- **대화형 내비게이션**: 단계별 안내와 제공하여 길 찾기 경험을 향상
 - **모바일 퍼스트**: 카메라가 장착된 모바일 기기에서의 사용성을 최우선으로 고려하여 설계됨
 
 ## 🛠️ 기술 스택
@@ -62,12 +62,10 @@ pnpm dev
 - **`app/demo/page.tsx`**: 데모 시나리오용 페이지
 - **`app/api/`**: Next.js Route Handler
   - `navigation/start|step/route.ts`: 외부 백엔드 프록시
-  - `navigation/.../demo/route.ts`: 데모용 Mock 응답
   - `destination/route.ts`: 예시 목적지 검색 API
 - **`app/components/`**
   - `Camera*.tsx`: 카메라 래퍼 및 오버레이 포함 레이아웃
   - `overlay/`: 목적지 검색, 내비게이션 카드, 설정, 컨텍스트
-  - `demo/`: 데모 패널·비디오 컴포넌트
 - **`app/hooks/`**: `useCameraCapture`, `useDemo` 등
 - **`app/lib/`**: API Wrapper, 유틸
 ---
